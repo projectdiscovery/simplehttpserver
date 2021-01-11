@@ -9,6 +9,7 @@ import (
 	"net/http/httputil"
 )
 
+// Options passed via CLI
 type Options struct {
 	ListenAddress string
 	Folder        string
@@ -32,6 +33,7 @@ func main() {
 	fmt.Println(http.ListenAndServe(options.ListenAddress, Log(http.FileServer(http.Dir(options.Folder)))))
 }
 
+// Log middleware
 func Log(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fullRequest, _ := httputil.DumpRequest(r, true)
@@ -40,7 +42,7 @@ func Log(handler http.Handler) http.Handler {
 
 		if options.Verbose {
 			headers := new(bytes.Buffer)
-			lrw.Header().Write(headers)
+			lrw.Header().Write(headers) //nolint
 			log.Printf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
 			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
@@ -54,9 +56,8 @@ type loggingResponseWriter struct {
 	Data       []byte
 }
 
+// NewLoggingResponseWriter structure
 func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
-	// WriteHeader(int) is not called if our response implicitly returns 200 OK, so
-	// we default to that status code.
 	return &loggingResponseWriter{w, http.StatusOK, []byte{}}
 }
 
