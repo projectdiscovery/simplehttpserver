@@ -9,40 +9,37 @@ import (
 	"net/http/httputil"
 )
 
-// Options passed via CLI
-type Options struct {
+type options struct {
 	ListenAddress string
 	Folder        string
 	Verbose       bool
 }
 
-var options Options
+var opts options
 
 func main() {
-
-	flag.StringVar(&options.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
-	flag.StringVar(&options.Folder, "path", ".", "Folder")
-	flag.BoolVar(&options.Verbose, "v", false, "Verbose")
+	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
+	flag.StringVar(&opts.Folder, "path", ".", "Folder")
+	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.Parse()
 
-	if flag.NArg() > 0 && options.Folder == "." {
-		options.Folder = flag.Args()[0]
+	if flag.NArg() > 0 && opts.Folder == "." {
+		opts.Folder = flag.Args()[0]
 	}
 
-	log.Printf("Serving %s on http://%s/...", options.Folder, options.ListenAddress)
-	fmt.Println(http.ListenAndServe(options.ListenAddress, Log(http.FileServer(http.Dir(options.Folder)))))
+	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
+	fmt.Println(http.ListenAndServe(opts.ListenAddress, loglayer(http.FileServer(http.Dir(opts.Folder)))))
 }
 
-// Log middleware
-func Log(handler http.Handler) http.Handler {
+func loglayer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fullRequest, _ := httputil.DumpRequest(r, true)
-		lrw := NewLoggingResponseWriter(w)
+		lrw := newLoggingResponseWriter(w)
 		handler.ServeHTTP(lrw, r)
 
-		if options.Verbose {
+		if opts.Verbose {
 			headers := new(bytes.Buffer)
-			lrw.Header().Write(headers) //nolint
+			lrw.Header().Write(headers)
 			log.Printf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
 			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
@@ -56,8 +53,7 @@ type loggingResponseWriter struct {
 	Data       []byte
 }
 
-// NewLoggingResponseWriter structure
-func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
+func newLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
 	return &loggingResponseWriter{w, http.StatusOK, []byte{}}
 }
 
