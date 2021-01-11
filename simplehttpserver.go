@@ -39,7 +39,7 @@ func loglayer(handler http.Handler) http.Handler {
 
 		if opts.Verbose {
 			headers := new(bytes.Buffer)
-			lrw.Header().Write(headers)
+			lrw.Header().Write(headers) //nolint
 			log.Printf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
 			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
