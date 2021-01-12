@@ -14,17 +14,14 @@
 simplehttpserver is a go enhanced version of the well known python simplehttpserver.
 
 # Resources
-- [Resources](#resources)
+
 - [Features](#features)
 - [Usage](#usage)
 - [Installation Instructions](#installation-instructions)
-    - [From Binary](#from-binary)
-    - [From Source](#from-source)
-    - [From Github](#from-github)
-- [Running simplehttpserver in the current folder ](#Running simplehttpserver in the current folder )
+- [Running simplehttpserver](#running-simplehttpserver-in-the-current-folder )
 - [Thanks](#thanks)
 
- # Features
+# Features
 
 <h1 align="left">
   <img src="static/simplehttpserver-run.png" alt="simplehttpserver" width="700px"></a>
@@ -62,7 +59,7 @@ simplehttpserver requires **go1.14+** to install successfully. Run the following
 ### From Github
 
 ```sh
-▶ git clone https://github.com/projectdiscovery/simplehttpserver.git; cd simplehttpserver; go build; mv simplehttpserver /usr/local/bin/; simplehttpserver -version
+▶ git clone https://github.com/projectdiscovery/simplehttpserver.git; cd simplehttpserver; go build; mv simplehttpserver /usr/local/bin/; simplehttpserver -h
 ```
 
 # Usage
@@ -73,11 +70,11 @@ simplehttpserver -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag                    | Description                                             | Example                                            |
-|-------------------------|---------------------------------------------------------|----------------------------------------------------|
-| listen                  | Configure listening ip:port (default 127.0.0.1:8000)    | simplehttpserver -listen 127.0.0.1:8000            |
-| path                    | Fileserver folder (default current directory)           | simplehttpserver -path /var/docs                   |
-| v                       | Verbose (dump request/response, default false)          | simplehttpserver -v                                |
+| Flag   | Description                                          | Example                                 |
+| ------ | ---------------------------------------------------- | --------------------------------------- |
+| listen | Configure listening ip:port (default 127.0.0.1:8000) | simplehttpserver -listen 127.0.0.1:8000 |
+| path   | Fileserver folder (default current directory)        | simplehttpserver -path /var/docs        |
+| v      | Verbose (dump request/response, default false)       | simplehttpserver -v                     |
 
 ### Running simplehttpserver in the current folder  
 
