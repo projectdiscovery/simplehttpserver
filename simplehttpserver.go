@@ -63,8 +63,8 @@ func basicauthlayer(handler http.Handler) http.HandlerFunc {
 		user, pass, ok := r.BasicAuth()
 		if !ok || user != opts.Username || pass != opts.Password {
 			w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", opts.Realm))
-			w.WriteHeader(401)
-			w.Write([]byte("Unauthorized.\n"))
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Unauthorized.\n")) //nolint
 			return
 		}
 		handler.ServeHTTP(w, r)
