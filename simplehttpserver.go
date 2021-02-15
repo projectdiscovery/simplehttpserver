@@ -12,6 +12,9 @@ import (
 type options struct {
 	ListenAddress string
 	Folder        string
+	Username      string
+	Password      string
+	Realm         string
 	Verbose       bool
 }
 
@@ -21,6 +24,9 @@ func main() {
 	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
 	flag.StringVar(&opts.Folder, "path", ".", "Folder")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
+	flag.StringVar(&opts.Username, "username", "", "Basic auth username")
+	flag.StringVar(&opts.Password, "password", "", "Basic auth password")
+	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
 	flag.Parse()
 
 	if flag.NArg() > 0 && opts.Folder == "." {
@@ -28,7 +34,12 @@ func main() {
 	}
 
 	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
-	fmt.Println(http.ListenAndServe(opts.ListenAddress, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
+	if opts.Username != "" || opts.Password != "" {
+		layers = loglayer(basicauthlayer(http.FileServer(http.Dir(opts.Folder))))
+	}
+
+	fmt.Println(http.ListenAndServe(opts.ListenAddress, layers))
 }
 
 func loglayer(handler http.Handler) http.Handler {
@@ -44,6 +55,19 @@ func loglayer(handler http.Handler) http.Handler {
 		} else {
 			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
 		}
+	})
+}
+
+func basicauthlayer(handler http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, ok := r.BasicAuth()
+		if !ok || user != opts.Username || pass != opts.Password {
+			w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", opts.Realm))
+			w.WriteHeader(401)
+			w.Write([]byte("Unauthorized.\n"))
+			return
+		}
+		handler.ServeHTTP(w, r)
 	})
 }
 
