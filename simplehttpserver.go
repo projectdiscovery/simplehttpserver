@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"path"
 )
 
 type options struct {
@@ -15,7 +17,11 @@ type options struct {
 	Username      string
 	Password      string
 	Realm         string
+	Certificate   string
+	Key           string
+	HTTPS         bool
 	Verbose       bool
+	Upload        bool
 }
 
 var opts options
@@ -23,10 +29,15 @@ var opts options
 func main() {
 	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
 	flag.StringVar(&opts.Folder, "path", ".", "Folder")
+	flag.BoolVar(&opts.Upload, "upload", false, "Enable upload via PUT")
+	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
+	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
+	flag.StringVar(&opts.Key, "key", "", "Key")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.StringVar(&opts.Username, "username", "", "Basic auth username")
 	flag.StringVar(&opts.Password, "password", "", "Basic auth password")
 	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
+
 	flag.Parse()
 
 	if flag.NArg() > 0 && opts.Folder == "." {
@@ -39,7 +50,17 @@ func main() {
 		layers = loglayer(basicauthlayer(http.FileServer(http.Dir(opts.Folder))))
 	}
 
-	fmt.Println(http.ListenAndServe(opts.ListenAddress, layers))
+	if opts.Upload {
+		log.Println("Upload enabled")
+	}
+	if opts.HTTPS {
+		if opts.Certificate == "" || opts.Key == "" {
+			log.Fatal("Certificate or Key file not specified")
+		}
+		fmt.Println(http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
+	} else {
+		fmt.Println(http.ListenAndServe(opts.ListenAddress, layers))
+	}
 }
 
 func loglayer(handler http.Handler) http.Handler {
@@ -47,6 +68,18 @@ func loglayer(handler http.Handler) http.Handler {
 		fullRequest, _ := httputil.DumpRequest(r, true)
 		lrw := newLoggingResponseWriter(w)
 		handler.ServeHTTP(lrw, r)
+
+		// Handles file write if enabled
+		if opts.Upload && r.Method == http.MethodPut {
+			data, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				log.Println(err)
+			}
+			err = handleUpload(path.Base(r.URL.Path), data)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 
 		if opts.Verbose {
 			headers := new(bytes.Buffer)
@@ -93,4 +126,8 @@ func (lrw *loggingResponseWriter) Header() http.Header {
 func (lrw *loggingResponseWriter) WriteHeader(code int) {
 	lrw.statusCode = code
 	lrw.ResponseWriter.WriteHeader(code)
+}
+
+func handleUpload(file string, data []byte) error {
+	return ioutil.WriteFile(file, data, 0655)
 }
