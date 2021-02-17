@@ -14,6 +14,9 @@ import (
 type options struct {
 	ListenAddress string
 	Folder        string
+	Username      string
+	Password      string
+	Realm         string
 	Certificate   string
 	Key           string
 	HTTPS         bool
@@ -31,6 +34,9 @@ func main() {
 	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
 	flag.StringVar(&opts.Key, "key", "", "Key")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
+	flag.StringVar(&opts.Username, "username", "", "Basic auth username")
+	flag.StringVar(&opts.Password, "password", "", "Basic auth password")
+	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
 
 	flag.Parse()
 
@@ -39,6 +45,11 @@ func main() {
 	}
 
 	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
+	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
+	if opts.Username != "" || opts.Password != "" {
+		layers = loglayer(basicauthlayer(http.FileServer(http.Dir(opts.Folder))))
+	}
+
 	if opts.Upload {
 		log.Println("Upload enabled")
 	}
@@ -46,9 +57,9 @@ func main() {
 		if opts.Certificate == "" || opts.Key == "" {
 			log.Fatal("Certificate or Key file not specified")
 		}
-		fmt.Println(http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+		fmt.Println(http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
 	} else {
-		fmt.Println(http.ListenAndServe(opts.ListenAddress, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+		fmt.Println(http.ListenAndServe(opts.ListenAddress, layers))
 	}
 }
 
@@ -77,6 +88,19 @@ func loglayer(handler http.Handler) http.Handler {
 		} else {
 			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
 		}
+	})
+}
+
+func basicauthlayer(handler http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, ok := r.BasicAuth()
+		if !ok || user != opts.Username || pass != opts.Password {
+			w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", opts.Realm))
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Unauthorized.\n")) //nolint
+			return
+		}
+		handler.ServeHTTP(w, r)
 	})
 }
 
