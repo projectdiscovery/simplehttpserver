@@ -12,6 +12,9 @@ import (
 type options struct {
 	ListenAddress string
 	Folder        string
+	Certificate   string
+	Key           string
+	HTTPS         bool
 	Verbose       bool
 }
 
@@ -20,6 +23,9 @@ var opts options
 func main() {
 	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
 	flag.StringVar(&opts.Folder, "path", ".", "Folder")
+	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
+	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
+	flag.StringVar(&opts.Key, "key", "", "Key")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.Parse()
 
@@ -28,7 +34,14 @@ func main() {
 	}
 
 	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
-	fmt.Println(http.ListenAndServe(opts.ListenAddress, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+	if opts.HTTPS {
+		if opts.Certificate == "" || opts.Key == "" {
+			log.Fatal("Certificate or Key file not specified")
+		}
+		fmt.Println(http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+	} else {
+		fmt.Println(http.ListenAndServe(opts.ListenAddress, loglayer(http.FileServer(http.Dir(opts.Folder)))))
+	}
 }
 
 func loglayer(handler http.Handler) http.Handler {
