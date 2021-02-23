@@ -59,19 +59,17 @@ func main() {
 	}
 
 	if opts.Upload {
-		gologger.Print().Msgf("Upload enabled")
+		gologger.Print().Msg("Upload enabled")
 	}
 retry_listen:
 	var err error
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
-			gologger.Fatal().Msgf("Certificate or Key file not specified")
+			gologger.Fatal().Msg("Certificate or Key file not specified")
 		}
 		err = http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers)
-
 	} else {
 		err = http.ListenAndServe(opts.ListenAddress, layers)
-		gologger.Print().Msgf("%s\n")
 	}
 	if err != nil {
 		if isErrorAddressAlreadyInUse(err) {
