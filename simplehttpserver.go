@@ -2,13 +2,19 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"path"
+	"runtime"
+	"strconv"
+	"syscall"
 
 	"github.com/projectdiscovery/gologger"
 )
@@ -55,13 +61,29 @@ func main() {
 	if opts.Upload {
 		gologger.Print().Msgf("Upload enabled")
 	}
+retry_listen:
+	var err error
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
 			gologger.Fatal().Msgf("Certificate or Key file not specified")
 		}
-		gologger.Print().Msgf("%s\n", http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
+		err = http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers)
+
 	} else {
-		gologger.Print().Msgf("%s\n", http.ListenAndServe(opts.ListenAddress, layers))
+		err = http.ListenAndServe(opts.ListenAddress, layers)
+		gologger.Print().Msgf("%s\n")
+	}
+	if err != nil {
+		if isErrorAddressAlreadyInUse(err) {
+			gologger.Warning().Msgf("Can't listen on %s: %s - retrying with another port\n", opts.ListenAddress, err)
+			newListenAddress, err := incPort(opts.ListenAddress)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+			opts.ListenAddress = newListenAddress
+			goto retry_listen
+		}
+		gologger.Warning().Msgf("%s\n", err)
 	}
 }
 
@@ -132,4 +154,40 @@ func (lrw *loggingResponseWriter) WriteHeader(code int) {
 
 func handleUpload(file string, data []byte) error {
 	return ioutil.WriteFile(file, data, 0655)
+}
+
+func isErrorAddressAlreadyInUse(err error) bool {
+	var eOsSyscall *os.SyscallError
+	if !errors.As(err, &eOsSyscall) {
+		return false
+	}
+	var errErrno syscall.Errno // doesn't need a "*" (ptr) because it's already a ptr (uintptr)
+	if !errors.As(eOsSyscall, &errErrno) {
+		return false
+	}
+	if errErrno == syscall.EADDRINUSE {
+		return true
+	}
+	const WSAEADDRINUSE = 10048
+	if runtime.GOOS == "windows" && errErrno == WSAEADDRINUSE {
+		return true
+	}
+	return false
+}
+
+func incPort(address string) (string, error) {
+	addrOrig, portOrig, err := net.SplitHostPort(address)
+	if err != nil {
+		return address, err
+	}
+
+	// increment port
+	portNumber, err := strconv.Atoi(portOrig)
+	if err != nil {
+		return address, err
+	}
+	portNumber++
+	newPort := strconv.FormatInt(int64(portNumber), 10)
+
+	return net.JoinHostPort(addrOrig, newPort), nil
 }
