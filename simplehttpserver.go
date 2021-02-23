@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"path"
+	"strings"
 
 	"github.com/projectdiscovery/gologger"
 )
@@ -16,8 +17,9 @@ import (
 type options struct {
 	ListenAddress string
 	Folder        string
-	Username      string
-	Password      string
+	BasicAuth     string
+	username      string
+	password      string
 	Realm         string
 	Certificate   string
 	Key           string
@@ -36,8 +38,7 @@ func main() {
 	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
 	flag.StringVar(&opts.Key, "key", "", "Key")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
-	flag.StringVar(&opts.Username, "username", "", "Basic auth username")
-	flag.StringVar(&opts.Password, "password", "", "Basic auth password")
+	flag.StringVar(&opts.BasicAuth, "basic-auth", "", "Basic auth (username:password)")
 	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
 
 	flag.Parse()
@@ -48,7 +49,14 @@ func main() {
 
 	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
-	if opts.Username != "" || opts.Password != "" {
+	if opts.BasicAuth != "" {
+		baTokens := strings.SplitN(opts.BasicAuth, ":", 2)
+		if len(baTokens) > 0 {
+			opts.username = baTokens[0]
+		}
+		if len(baTokens) > 1 {
+			opts.password = baTokens[1]
+		}
 		layers = loglayer(basicauthlayer(http.FileServer(http.Dir(opts.Folder))))
 	}
 
@@ -96,7 +104,7 @@ func loglayer(handler http.Handler) http.Handler {
 func basicauthlayer(handler http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
-		if !ok || user != opts.Username || pass != opts.Password {
+		if !ok || user != opts.username || pass != opts.password {
 			w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", opts.Realm))
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("Unauthorized.\n")) //nolint
