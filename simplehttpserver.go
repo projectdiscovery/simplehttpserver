@@ -14,8 +14,8 @@ import (
 	"path"
 	"runtime"
 	"strconv"
-	"syscall"
 	"strings"
+	"syscall"
 
 	"github.com/projectdiscovery/gologger"
 )
@@ -53,7 +53,6 @@ func main() {
 		opts.Folder = flag.Args()[0]
 	}
 
-	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
 	if opts.BasicAuth != "" {
 		baTokens := strings.SplitN(opts.BasicAuth, ":", 2)
@@ -65,11 +64,11 @@ func main() {
 		}
 		layers = loglayer(basicauthlayer(http.FileServer(http.Dir(opts.Folder))))
 	}
-
 	if opts.Upload {
-		gologger.Print().Msg("Upload enabled")
+		gologger.Print().Msg("Starting service with Upload enabled")
 	}
 retry_listen:
+	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	var err error
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
@@ -81,7 +80,7 @@ retry_listen:
 	}
 	if err != nil {
 		if isErrorAddressAlreadyInUse(err) {
-			gologger.Warning().Msgf("Can't listen on %s: %s - retrying with another port\n", opts.ListenAddress, err)
+			gologger.Print().Msgf("Can't listen on %s: %s - retrying with another port\n", opts.ListenAddress, err)
 			newListenAddress, err := incPort(opts.ListenAddress)
 			if err != nil {
 				gologger.Fatal().Msgf("%s\n", err)
@@ -89,7 +88,7 @@ retry_listen:
 			opts.ListenAddress = newListenAddress
 			goto retry_listen
 		}
-		gologger.Warning().Msgf("%s\n", err)
+		gologger.Print().Msgf("%s\n", err)
 	}
 }
 
