@@ -10,6 +10,8 @@ import (
 	"net/http/httputil"
 	"path"
 	"strings"
+
+	"github.com/projectdiscovery/gologger"
 )
 
 type options struct {
@@ -45,7 +47,7 @@ func main() {
 		opts.Folder = flag.Args()[0]
 	}
 
-	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
+	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
 	if opts.BasicAuth != "" {
 		baTokens := strings.SplitN(opts.BasicAuth, ":", 2)
@@ -59,15 +61,15 @@ func main() {
 	}
 
 	if opts.Upload {
-		log.Println("Upload enabled")
+		gologger.Print().Msgf("Upload enabled")
 	}
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
-			log.Fatal("Certificate or Key file not specified")
+			gologger.Fatal().Msgf("Certificate or Key file not specified")
 		}
-		fmt.Println(http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
+		gologger.Print().Msgf("%s\n", http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
 	} else {
-		fmt.Println(http.ListenAndServe(opts.ListenAddress, layers))
+		gologger.Print().Msgf("%s\n", http.ListenAndServe(opts.ListenAddress, layers))
 	}
 }
 
@@ -92,9 +94,9 @@ func loglayer(handler http.Handler) http.Handler {
 		if opts.Verbose {
 			headers := new(bytes.Buffer)
 			lrw.Header().Write(headers) //nolint
-			log.Printf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
+			gologger.Print().Msgf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
-			log.Printf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
+			gologger.Print().Msgf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, len(lrw.Data))
 		}
 	})
 }
