@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
 	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
 )
 
@@ -24,6 +25,7 @@ type options struct {
 	Realm         string
 	Certificate   string
 	Key           string
+	Domain        string
 	HTTPS         bool
 	Verbose       bool
 	Upload        bool
@@ -44,6 +46,7 @@ func main() {
 	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
 	flag.StringVar(&opts.Key, "key", "", "Key")
+	flag.StringVar(&opts.Domain, "domain", "", "Domain")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.StringVar(&opts.BasicAuth, "basic-auth", "", "Basic auth (username:password)")
 	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
@@ -85,9 +88,21 @@ func main() {
 	}
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
-			gologger.Fatal().Msgf("Certificate or Key file not specified")
+			tlsOptions := sslcert.DefaultOptions
+			tlsOptions.Host = opts.Domain
+			tlsConfig, err := sslcert.NewTLSConfig(tlsOptions)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+			httpServer := &http.Server{
+				Addr:      opts.ListenAddress,
+				TLSConfig: tlsConfig,
+			}
+			httpServer.Handler = layers
+			gologger.Print().Msgf("%s\n", httpServer.ListenAndServeTLS("", ""))
+		} else {
+			gologger.Print().Msgf("%s\n", http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
 		}
-		gologger.Print().Msgf("%s\n", http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
 	} else {
 		gologger.Print().Msgf("%s\n", http.ListenAndServe(opts.ListenAddress, layers))
 	}
