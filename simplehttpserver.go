@@ -48,7 +48,7 @@ func main() {
 	log.Printf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
 	if opts.BasicAuth != "" {
-		baTokens := strings.SplitN(opts.BasicAuth, ":", 1)
+		baTokens := strings.SplitN(opts.BasicAuth, ":", 2)
 		if len(baTokens) > 0 {
 			opts.username = baTokens[0]
 		}
