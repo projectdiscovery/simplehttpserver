@@ -133,6 +133,7 @@ func Generate(options Options) (privateKey, publicKey []byte, err error) {
 		err = fmt.Errorf("Failed to write data to cert.pem: %v", err)
 		return
 	}
+	pubKeyBufb.Flush()
 
 	privBytes, err := x509.MarshalPKCS8PrivateKey(priv)
 	if err != nil {
@@ -146,6 +147,7 @@ func Generate(options Options) (privateKey, publicKey []byte, err error) {
 		err = fmt.Errorf("Failed to write data to key.pem: %v", err)
 		return
 	}
+	privKeyBufb.Flush()
 
 	return pubKeyBuf.Bytes(), privKeyBuf.Bytes(), nil
 }

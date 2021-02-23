@@ -37,7 +37,7 @@ func main() {
 	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
 	flag.StringVar(&opts.Key, "key", "", "Key")
-	flag.StringVar(&opts.Domain, "domain", "", "Domain")
+	flag.StringVar(&opts.Domain, "domain", "local.host", "Domain")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.StringVar(&opts.Username, "username", "", "Basic auth username")
 	flag.StringVar(&opts.Password, "password", "", "Basic auth password")
