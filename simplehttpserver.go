@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
 )
 
 type options struct {
@@ -26,12 +27,18 @@ type options struct {
 	HTTPS         bool
 	Verbose       bool
 	Upload        bool
+	TCP           bool
+	RulesFile     string
+	TLS           bool
 }
 
 var opts options
 
 func main() {
 	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
+	flag.BoolVar(&opts.TCP, "tcp", false, "TCP Server")
+	flag.BoolVar(&opts.TLS, "tls", false, "Enable TCP TLS")
+	flag.StringVar(&opts.RulesFile, "rules", "", "Rules yaml file")
 	flag.StringVar(&opts.Folder, "path", ".", "Folder")
 	flag.BoolVar(&opts.Upload, "upload", false, "Enable upload via PUT")
 	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
@@ -45,6 +52,19 @@ func main() {
 
 	if flag.NArg() > 0 && opts.Folder == "." {
 		opts.Folder = flag.Args()[0]
+	}
+
+	if opts.TCP {
+		serverTCP, err := tcpserver.New(tcpserver.Options{Listen: opts.ListenAddress, TLS: opts.TLS, Domain: "local.host"})
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+		err = serverTCP.LoadTemplate(opts.RulesFile)
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+
+		gologger.Print().Msgf("%s\n", serverTCP.ListenAndServe())
 	}
 
 	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
