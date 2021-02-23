@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
 	"gopkg.in/yaml.v2"
 )
 
@@ -71,7 +72,7 @@ func (t *TCPServer) ListenAndServeTLS() error {
 		tlsConfig = &tls.Config{Certificates: []tls.Certificate{cert}}
 	} else {
 		tlsOptions := sslcert.DefaultOptions
-		tlsOptions.Host = opts.Domain
+		tlsOptions.Host = t.options.Domain
 		cfg, err := sslcert.NewTLSConfig(tlsOptions)
 		if err != nil {
 			return err
