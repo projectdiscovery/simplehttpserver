@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -102,11 +101,11 @@ func loglayer(handler http.Handler) http.Handler {
 		if opts.Upload && r.Method == http.MethodPut {
 			data, err := ioutil.ReadAll(r.Body)
 			if err != nil {
-				log.Println(err)
+				gologger.Print().Msgf("%s\n", err)
 			}
 			err = handleUpload(path.Base(r.URL.Path), data)
 			if err != nil {
-				log.Println(err)
+				gologger.Print().Msgf("%s\n", err)
 			}
 		}
 
