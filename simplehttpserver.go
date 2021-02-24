@@ -17,6 +17,8 @@ import (
 	"syscall"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
+	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
 )
 
 type options struct {
@@ -28,20 +30,28 @@ type options struct {
 	Realm         string
 	Certificate   string
 	Key           string
+	Domain        string
 	HTTPS         bool
 	Verbose       bool
 	Upload        bool
+	TCP           bool
+	RulesFile     string
+	TLS           bool
 }
 
 var opts options
 
 func main() {
 	flag.StringVar(&opts.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
+	flag.BoolVar(&opts.TCP, "tcp", false, "TCP Server")
+	flag.BoolVar(&opts.TLS, "tls", false, "Enable TCP TLS")
+	flag.StringVar(&opts.RulesFile, "rules", "", "Rules yaml file")
 	flag.StringVar(&opts.Folder, "path", ".", "Folder")
 	flag.BoolVar(&opts.Upload, "upload", false, "Enable upload via PUT")
 	flag.BoolVar(&opts.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&opts.Certificate, "cert", "", "Certificate")
 	flag.StringVar(&opts.Key, "key", "", "Key")
+	flag.StringVar(&opts.Domain, "domain", "local.host", "Domain")
 	flag.BoolVar(&opts.Verbose, "v", false, "Verbose")
 	flag.StringVar(&opts.BasicAuth, "basic-auth", "", "Basic auth (username:password)")
 	flag.StringVar(&opts.Realm, "realm", "Please enter username and password", "Realm")
@@ -52,6 +62,20 @@ func main() {
 		opts.Folder = flag.Args()[0]
 	}
 
+	if opts.TCP {
+		serverTCP, err := tcpserver.New(tcpserver.Options{Listen: opts.ListenAddress, TLS: opts.TLS, Domain: "local.host"})
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+		err = serverTCP.LoadTemplate(opts.RulesFile)
+		if err != nil {
+			gologger.Fatal().Msgf("%s\n", err)
+		}
+
+		gologger.Print().Msgf("%s\n", serverTCP.ListenAndServe())
+	}
+
+	gologger.Print().Msgf("Serving %s on http://%s/...", opts.Folder, opts.ListenAddress)
 	layers := loglayer(http.FileServer(http.Dir(opts.Folder)))
 	if opts.BasicAuth != "" {
 		baTokens := strings.SplitN(opts.BasicAuth, ":", 2)
@@ -71,9 +95,21 @@ retry_listen:
 	var err error
 	if opts.HTTPS {
 		if opts.Certificate == "" || opts.Key == "" {
-			gologger.Fatal().Msg("Certificate or Key file not specified")
+			tlsOptions := sslcert.DefaultOptions
+			tlsOptions.Host = opts.Domain
+			tlsConfig, err := sslcert.NewTLSConfig(tlsOptions)
+			if err != nil {
+				gologger.Fatal().Msgf("%s\n", err)
+			}
+			httpServer := &http.Server{
+				Addr:      opts.ListenAddress,
+				TLSConfig: tlsConfig,
+			}
+			httpServer.Handler = layers
+			gologger.Print().Msgf("%s\n", httpServer.ListenAndServeTLS("", ""))
+		} else {
+			gologger.Print().Msgf("%s\n", http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers))
 		}
-		err = http.ListenAndServeTLS(opts.ListenAddress, opts.Certificate, opts.Key, layers)
 	} else {
 		err = http.ListenAndServe(opts.ListenAddress, layers)
 	}
