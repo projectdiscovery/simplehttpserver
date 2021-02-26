@@ -1,6 +1,6 @@
 builds:
     - binary: simplehttpserver
-      main: simplehttpserver.go
+      main: cmd/simplehttpserver/simplehttpserver.go
       goos:
         - linux
         - windows

@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
 	"gopkg.in/yaml.v2"
 )
@@ -17,6 +18,7 @@ type Options struct {
 	Key         string
 	Domain      string
 	rules       []Rule
+	Verbose     bool
 }
 
 type TCPServer struct {
@@ -34,6 +36,7 @@ func (t *TCPServer) AddRule(rule Rule) error {
 }
 
 func (t *TCPServer) ListenAndServe() error {
+	gologger.Print().Msgf("Serving %s on tcp://%s", t.options.Listen)
 	listener, err := net.Listen("tcp4", t.options.Listen)
 	if err != nil {
 		return err
@@ -53,12 +56,16 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 			return err
 		}
 
+		gologger.Print().Msgf("%s\n", buf)
+
 		resp, err := t.BuildResponse(buf)
 		if err != nil {
 			return err
 		}
 
 		conn.Write(resp)
+
+		gologger.Print().Msgf("%s\n", resp)
 	}
 }
 
