@@ -1,6 +1,8 @@
 package runner
 
 import (
+	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/simplehttpserver/pkg/binder"
 	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
 )
@@ -14,6 +16,16 @@ type Runner struct {
 
 func New(options *Options) (*Runner, error) {
 	r := Runner{options: options}
+	// Check if the process can listen on the specified ip:port
+	if !binder.CanListenOn(r.options.ListenAddress) {
+		newListenAddress, err := binder.GetRandomListenAddress(r.options.ListenAddress)
+		if err != nil {
+			return nil, err
+		}
+		gologger.Print().Msgf("Can't listen on %s: %s - Using\n", r.options.ListenAddress, err, newListenAddress)
+		r.options.ListenAddress = newListenAddress
+	}
+
 	if r.options.EnableTCP {
 		serverTCP, err := tcpserver.New(tcpserver.Options{
 			Listen:  r.options.ListenAddress,
@@ -55,16 +67,25 @@ func New(options *Options) (*Runner, error) {
 
 func (r *Runner) Run() error {
 	if r.options.EnableTCP {
+		gologger.Print().Msgf("Serving TCP rule based server on tcp://%s", r.options.ListenAddress)
 		return r.serverTCP.ListenAndServe()
 	}
 
 	if r.options.HTTPS {
+		gologger.Print().Msgf("Serving %s on https://%s/...", r.options.Folder, r.options.ListenAddress)
 		return r.httpServer.ListenAndServeTLS()
 	}
 
+	gologger.Print().Msgf("Serving %s on http://%s/...", r.options.Folder, r.options.ListenAddress)
 	return r.httpServer.ListenAndServe()
 }
 
 func (r *Runner) Close() error {
+	if r.serverTCP != nil {
+		r.serverTCP.Close()
+	}
+	if r.httpServer != nil {
+		r.httpServer.Close()
+	}
 	return nil
 }
