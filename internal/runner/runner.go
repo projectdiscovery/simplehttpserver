@@ -22,7 +22,7 @@ func New(options *Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
-		gologger.Print().Msgf("Can't listen on %s: %s - Using\n", r.options.ListenAddress, err, newListenAddress)
+		gologger.Print().Msgf("Can't listen on %s: %s - Using %s\n", r.options.ListenAddress, err, newListenAddress)
 		r.options.ListenAddress = newListenAddress
 	}
 

@@ -36,7 +36,6 @@ func (t *TCPServer) AddRule(rule Rule) error {
 }
 
 func (t *TCPServer) ListenAndServe() error {
-	gologger.Print().Msgf("Serving %s on tcp://%s", t.options.Listen)
 	listener, err := net.Listen("tcp4", t.options.Listen)
 	if err != nil {
 		return err
