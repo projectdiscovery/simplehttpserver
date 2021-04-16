@@ -72,11 +72,11 @@ func (r *Runner) Run() error {
 	}
 
 	if r.options.HTTPS {
-		gologger.Print().Msgf("Serving %s on https://%s/...", r.options.Folder, r.options.ListenAddress)
+		gologger.Print().Msgf("Serving %s on https://%s/", r.options.FolderAbsPath(), r.options.ListenAddress)
 		return r.httpServer.ListenAndServeTLS()
 	}
 
-	gologger.Print().Msgf("Serving %s on http://%s/...", r.options.Folder, r.options.ListenAddress)
+	gologger.Print().Msgf("Serving %s on http://%s/", r.options.FolderAbsPath(), r.options.ListenAddress)
 	return r.httpServer.ListenAndServe()
 }
 

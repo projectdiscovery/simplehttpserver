@@ -3,6 +3,7 @@ package runner
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
@@ -90,4 +91,12 @@ func (options *Options) configureOutput() {
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
 	}
+}
+
+func (o Options) FolderAbsPath() string {
+	abspath, err := filepath.Abs(o.Folder)
+	if err != nil {
+		return o.Folder
+	}
+	return abspath
 }
