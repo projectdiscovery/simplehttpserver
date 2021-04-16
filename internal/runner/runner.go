@@ -14,6 +14,7 @@ type Runner struct {
 	httpServer *httpserver.HTTPServer
 }
 
+// New instance of runner
 func New(options *Options) (*Runner, error) {
 	r := Runner{options: options}
 	// Check if the process can listen on the specified ip:port
@@ -27,7 +28,7 @@ func New(options *Options) (*Runner, error) {
 	}
 
 	if r.options.EnableTCP {
-		serverTCP, err := tcpserver.New(tcpserver.Options{
+		serverTCP, err := tcpserver.New(&tcpserver.Options{
 			Listen:  r.options.ListenAddress,
 			TLS:     r.options.TCPWithTLS,
 			Domain:  "local.host",
@@ -65,6 +66,7 @@ func New(options *Options) (*Runner, error) {
 	return &r, nil
 }
 
+// Run logic
 func (r *Runner) Run() error {
 	if r.options.EnableTCP {
 		gologger.Print().Msgf("Serving TCP rule based server on tcp://%s", r.options.ListenAddress)
@@ -72,20 +74,25 @@ func (r *Runner) Run() error {
 	}
 
 	if r.options.HTTPS {
-		gologger.Print().Msgf("Serving %s on https://%s/...", r.options.Folder, r.options.ListenAddress)
+		gologger.Print().Msgf("Serving %s on https://%s/", r.options.FolderAbsPath(), r.options.ListenAddress)
 		return r.httpServer.ListenAndServeTLS()
 	}
 
-	gologger.Print().Msgf("Serving %s on http://%s/...", r.options.Folder, r.options.ListenAddress)
+	gologger.Print().Msgf("Serving %s on http://%s/", r.options.FolderAbsPath(), r.options.ListenAddress)
 	return r.httpServer.ListenAndServe()
 }
 
+// Close the listening services
 func (r *Runner) Close() error {
 	if r.serverTCP != nil {
-		r.serverTCP.Close()
+		if err := r.serverTCP.Close(); err != nil {
+			return err
+		}
 	}
 	if r.httpServer != nil {
-		r.httpServer.Close()
+		if err := r.httpServer.Close(); err != nil {
+			return err
+		}
 	}
 	return nil
 }

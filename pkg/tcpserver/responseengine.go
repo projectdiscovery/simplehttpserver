@@ -4,6 +4,7 @@ import (
 	"errors"
 )
 
+// BuildResponse according to rules
 func (t *TCPServer) BuildResponse(data []byte) ([]byte, error) {
 	// Process all the rules
 	for _, rule := range t.options.rules {
@@ -11,5 +12,5 @@ func (t *TCPServer) BuildResponse(data []byte) ([]byte, error) {
 			return []byte(rule.Response), nil
 		}
 	}
-	return nil, errors.New("No matched rule")
+	return nil, errors.New("no matched rule")
 }

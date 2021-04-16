@@ -1,12 +1,12 @@
 package httpserver
 
 import (
-	"net"
 	"net/http"
 
-	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
+	"github.com/projectdiscovery/sslcert"
 )
 
+// Options of the http server
 type Options struct {
 	Folder            string
 	EnableUpload      bool
@@ -21,12 +21,13 @@ type Options struct {
 	Verbose           bool
 }
 
+// HTTPServer instance
 type HTTPServer struct {
-	options  *Options
-	layers   http.Handler
-	listener net.Listener
+	options *Options
+	layers  http.Handler
 }
 
+// New http server instance with options
 func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
 	EnableUpload = options.EnableUpload
@@ -39,10 +40,12 @@ func New(options *Options) (*HTTPServer, error) {
 	return &HTTPServer{options: options, layers: layers}, nil
 }
 
+// ListenAndServe requests over http
 func (t *HTTPServer) ListenAndServe() error {
 	return http.ListenAndServe(t.options.ListenAddress, t.layers)
 }
 
+// ListenAndServeTLS requests over https
 func (t *HTTPServer) ListenAndServeTLS() error {
 	if t.options.Certificate == "" || t.options.CertificateKey == "" {
 		tlsOptions := sslcert.DefaultOptions
@@ -61,6 +64,7 @@ func (t *HTTPServer) ListenAndServeTLS() error {
 	return http.ListenAndServeTLS(t.options.ListenAddress, t.options.Certificate, t.options.CertificateKey, t.layers)
 }
 
+// Close the service
 func (t *HTTPServer) Close() error {
 	return nil
 }

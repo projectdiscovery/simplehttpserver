@@ -54,15 +54,18 @@ func newLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
 	return &loggingResponseWriter{w, http.StatusOK, []byte{}}
 }
 
+// Write the data
 func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
 	lrw.Data = append(lrw.Data, data...)
 	return lrw.ResponseWriter.Write(data)
 }
 
+// Header of the response
 func (lrw *loggingResponseWriter) Header() http.Header {
 	return lrw.ResponseWriter.Header()
 }
 
+// WriteHeader status code
 func (lrw *loggingResponseWriter) WriteHeader(code int) {
 	lrw.statusCode = code
 	lrw.ResponseWriter.WriteHeader(code)

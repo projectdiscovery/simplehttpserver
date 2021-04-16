@@ -3,12 +3,14 @@ package runner
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 )
 
+// Options of the tool
 type Options struct {
 	ListenAddress  string
 	Folder         string
@@ -90,4 +92,13 @@ func (options *Options) configureOutput() {
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
 	}
+}
+
+// FolderAbsPath of the fileserver folder
+func (options *Options) FolderAbsPath() string {
+	abspath, err := filepath.Abs(options.Folder)
+	if err != nil {
+		return options.Folder
+	}
+	return abspath
 }
