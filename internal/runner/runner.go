@@ -14,6 +14,7 @@ type Runner struct {
 	httpServer *httpserver.HTTPServer
 }
 
+// New instance of runner
 func New(options *Options) (*Runner, error) {
 	r := Runner{options: options}
 	// Check if the process can listen on the specified ip:port
@@ -65,6 +66,7 @@ func New(options *Options) (*Runner, error) {
 	return &r, nil
 }
 
+// Run logic
 func (r *Runner) Run() error {
 	if r.options.EnableTCP {
 		gologger.Print().Msgf("Serving TCP rule based server on tcp://%s", r.options.ListenAddress)
@@ -80,6 +82,7 @@ func (r *Runner) Run() error {
 	return r.httpServer.ListenAndServe()
 }
 
+// Close the listening services
 func (r *Runner) Close() error {
 	if r.serverTCP != nil {
 		r.serverTCP.Close()

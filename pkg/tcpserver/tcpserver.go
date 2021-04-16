@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Options of the tcp server
 type Options struct {
 	Listen      string
 	TLS         bool
@@ -21,20 +22,24 @@ type Options struct {
 	Verbose     bool
 }
 
+// TCPServer instance
 type TCPServer struct {
 	options  Options
 	listener net.Listener
 }
 
+// New tcp server instance with specified options
 func New(options Options) (*TCPServer, error) {
 	return &TCPServer{options: options}, nil
 }
 
+// AddRule to the server
 func (t *TCPServer) AddRule(rule Rule) error {
 	t.options.rules = append(t.options.rules, rule)
 	return nil
 }
 
+// ListenAndServe requests
 func (t *TCPServer) ListenAndServe() error {
 	listener, err := net.Listen("tcp4", t.options.Listen)
 	if err != nil {
@@ -68,6 +73,7 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 	}
 }
 
+// ListenAndServe requests over tls
 func (t *TCPServer) ListenAndServeTLS() error {
 	var tlsConfig *tls.Config
 	if t.options.Certificate != "" && t.options.Key != "" {
@@ -108,6 +114,7 @@ func (t *TCPServer) Close() error {
 	return t.listener.Close()
 }
 
+// LoadTemplate from yaml
 func (t *TCPServer) LoadTemplate(templatePath string) error {
 	var config RulesConfiguration
 	yamlFile, err := ioutil.ReadFile(templatePath)
