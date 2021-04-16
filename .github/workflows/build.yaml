@@ -32,8 +32,8 @@ jobs:
 
       - name: Test
         run: go test .
-        working-directory: cmd/simplehttpserver/
+        working-directory: .
 
       - name: Build
         run: go build .
-        working-directory: cmd/simplehttpserver/
+        working-directory: .
