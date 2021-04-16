@@ -1,10 +1,9 @@
 package httpserver
 
 import (
-	"net"
 	"net/http"
 
-	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
+	"github.com/projectdiscovery/sslcert"
 )
 
 type Options struct {
@@ -22,9 +21,8 @@ type Options struct {
 }
 
 type HTTPServer struct {
-	options  *Options
-	layers   http.Handler
-	listener net.Listener
+	options *Options
+	layers  http.Handler
 }
 
 func New(options *Options) (*HTTPServer, error) {

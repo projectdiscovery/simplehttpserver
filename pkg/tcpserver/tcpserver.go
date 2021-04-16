@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/simplehttpserver/pkg/sslcert"
+	"github.com/projectdiscovery/sslcert"
 	"gopkg.in/yaml.v2"
 )
 
