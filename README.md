@@ -1,17 +1,18 @@
-<h1 align="center">
-  <img src="static/simplehttpserver-logo.png" alt="simplehttpserver" width="200px"></a>
-  <br>
-</h1>
+<h1 align="center">SimpleHTTPserver</h1>
+<h4 align="center">Go alternative of python SimpleHTTPServer</h4>
 
-[![License](https://img.shields.io/badge/license-MIT-_red.svg)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/projectdiscovery/simplehttpserver)](https://goreportcard.com/report/github.com/projectdiscovery/simplehttpserver)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/projectdiscovery/simplehttpserver/issues)
-[![GitHub Release](https://img.shields.io/github/release/projectdiscovery/simplehttpserver)](https://github.com/projectdiscovery/simplehttpserver/releases)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/pdiscoveryio.svg?logo=twitter)](https://twitter.com/pdiscoveryio)
-[![Docker Images](https://img.shields.io/docker/pulls/projectdiscovery/simplehttpserver.svg)](https://hub.docker.com/r/projectdiscovery/simplehttpserver)
-[![Chat on Discord](https://img.shields.io/discord/695645237418131507.svg?logo=discord)](https://discord.gg/KECAGdH)
 
-simplehttpserver is a go enhanced version of the well known python simplehttpserver with in addition a fully customizable TCP server, both supporting TLS.
+<p align="center">
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-_red.svg"></a>
+<a href="https://github.com/projectdiscovery/simplehttpserver/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://goreportcard.com/badge/github.com/projectdiscovery/simplehttpserver"><img src="https://goreportcard.com/badge/github.com/projectdiscovery/simplehttpserver"></a>
+<a href="https://hub.docker.com/r/projectdiscovery/simplehttpserver"><img src="https://img.shields.io/docker/pulls/projectdiscovery/simplehttpserver.svg"></a>
+<a href="https://twitter.com/pdiscoveryio"><img src="https://img.shields.io/twitter/follow/pdiscoveryio.svg?logo=twitter"></a>
+<a href="https://discord.gg/projectdiscovery"><img src="https://img.shields.io/discord/695645237418131507.svg?logo=discord"></a>
+</p>
+
+
+SimpleHTTPserver is a go enhanced version of the well known python simplehttpserver with in addition a fully customizable TCP server, both supporting TLS.
 
 # Resources
 
