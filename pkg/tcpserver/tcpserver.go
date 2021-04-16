@@ -54,7 +54,9 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 
 	buf := make([]byte, 4096)
 	for {
-		conn.SetReadDeadline(time.Now().Add(time.Duration(5 * time.Second)))
+		if err := conn.SetReadDeadline(time.Now().Add(time.Duration(5 * time.Second))); err != nil {
+			gologger.Info().Msgf("%s\n", err)
+		}
 		_, err := conn.Read(buf)
 		if err != nil {
 			return err
@@ -67,7 +69,9 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 			return err
 		}
 
-		conn.Write(resp)
+		if _, err := conn.Write(resp); err != nil {
+			gologger.Info().Msgf("%s\n", err)
+		}
 
 		gologger.Print().Msgf("%s\n", resp)
 	}
@@ -106,10 +110,11 @@ func (t *TCPServer) run() error {
 		if err != nil {
 			return err
 		}
-		go t.handleConnection(c)
+		go t.handleConnection(c) //nolint
 	}
 }
 
+// Close the service
 func (t *TCPServer) Close() error {
 	return t.listener.Close()
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/projectdiscovery/gologger/levels"
 )
 
+// Options of the tool
 type Options struct {
 	ListenAddress  string
 	Folder         string
@@ -94,7 +95,7 @@ func (options *Options) configureOutput() {
 }
 
 // FolderAbsPath of the fileserver folder
-func (o Options) FolderAbsPath() string {
+func (o *Options) FolderAbsPath() string {
 	abspath, err := filepath.Abs(o.Folder)
 	if err != nil {
 		return o.Folder

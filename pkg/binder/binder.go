@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/phayes/freeport"
+	"github.com/projectdiscovery/gologger"
 )
 
 // CanListenOn the specified address
@@ -13,7 +14,9 @@ func CanListenOn(address string) bool {
 	if err != nil {
 		return false
 	}
-	defer listener.Close()
+	if err := listener.Close(); err != nil {
+		gologger.Info().Msgf("%s\n", err)
+	}
 	return true
 }
 

@@ -85,10 +85,14 @@ func (r *Runner) Run() error {
 // Close the listening services
 func (r *Runner) Close() error {
 	if r.serverTCP != nil {
-		r.serverTCP.Close()
+		if err := r.serverTCP.Close(); err != nil {
+			return err
+		}
 	}
 	if r.httpServer != nil {
-		r.httpServer.Close()
+		if err := r.httpServer.Close(); err != nil {
+			return err
+		}
 	}
 	return nil
 }

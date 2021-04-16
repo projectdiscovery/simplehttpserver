@@ -13,6 +13,8 @@ func main() {
 		gologger.Fatal().Msgf("Could not create runner: %s\n", err)
 	}
 
-	r.Run()
+	if err := r.Run(); err != nil {
+		gologger.Info().Msgf("%s\n", err)
+	}
 	defer r.Close()
 }
