@@ -1,2 +1,2 @@
 *.exe
-simplehttpserver
+cmd/simplehttpserver/simplehttpserver
