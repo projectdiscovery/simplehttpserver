@@ -11,23 +11,20 @@
 <a href="https://discord.gg/projectdiscovery"><img src="https://img.shields.io/discord/695645237418131507.svg?logo=discord"></a>
 </p>
 
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#installing-simplehttpserver">Installation</a> •
+  <a href="#running-simplehttpserver-in-the-current-folder">Run SimpleHTTPserver</a> •
+  <a href="https://discord.gg/projectdiscovery">Join Discord</a>
+</p>
+
+---
 
 SimpleHTTPserver is a go enhanced version of the well known python simplehttpserver with in addition a fully customizable TCP server, both supporting TLS.
 
-# Resources
-
-- [Features](#features)
-- [Usage](#usage)
-- [Installation Instructions](#installation-instructions)
-- [Running simplehttpserver](#running-simplehttpserver-in-the-current-folder)
-- [Thanks](#thanks)
 
 # Features
-
-<h1 align="left">
-  <img src="static/simplehttpserver-run.png" alt="simplehttpserver" width="700px"></a>
-  <br>
-</h1>
 
 - HTTPS support
 - File server in arbitrary directory
@@ -36,33 +33,12 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 - Configurable HTTP/TCP server with customizable response via YAML template
 
 
-# Installation Instructions
+# Installing SimpleHTTPserver
 
-
-### From Binary
-
-The installation is easy. You can download the pre-built binaries for your platform from the [Releases](https://github.com/projectdiscovery/simplehttpserver/releases/) page. Extract them using tar, move it to your `$PATH`and you're ready to go.
+SimpleHTTPserver requires **go1.14+** to install successfully. Run the following command to get the repo - 
 
 ```sh
-Download latest binary from https://github.com/projectdiscovery/simplehttpserver/releases
-
-▶ tar -xvf simplehttpserver-linux-amd64.tar
-▶ mv simplehttpserver-linux-amd64 /usr/local/bin/simplehttpserver
-▶ simplehttpserver -h
-```
-
-### From Source
-
-simplehttpserver requires **go1.14+** to install successfully. Run the following command to get the repo - 
-
-```sh
-▶ GO111MODULE=on go get -v github.com/projectdiscovery/simplehttpserver
-```
-
-### From Github
-
-```sh
-▶ git clone https://github.com/projectdiscovery/simplehttpserver.git; cd simplehttpserver; go build; mv simplehttpserver /usr/local/bin/; simplehttpserver -h
+▶ GO111MODULE=on go get -v github.com/projectdiscovery/cmd/simplehttpserver
 ```
 
 # Usage
@@ -189,4 +165,4 @@ rules:
 
 # Thanks
 
-simplehttpserver is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team. Community contributions have made the project what it is. See the **[Thanks.md](https://github.com/projectdiscovery/simplehttpserver/blob/master/THANKS.md)** file for more details.
+SimpleHTTPserver is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team.
