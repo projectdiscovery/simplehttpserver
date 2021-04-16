@@ -33,5 +33,4 @@ func GetRandomListenAddress(currentAddress string) (string, error) {
 	}
 
 	return net.JoinHostPort(addrOrig, fmt.Sprintf("%d", newPort)), nil
-
 }

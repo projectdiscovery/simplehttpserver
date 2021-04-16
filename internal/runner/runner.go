@@ -28,7 +28,7 @@ func New(options *Options) (*Runner, error) {
 	}
 
 	if r.options.EnableTCP {
-		serverTCP, err := tcpserver.New(tcpserver.Options{
+		serverTCP, err := tcpserver.New(&tcpserver.Options{
 			Listen:  r.options.ListenAddress,
 			TLS:     r.options.TCPWithTLS,
 			Domain:  "local.host",

@@ -95,10 +95,10 @@ func (options *Options) configureOutput() {
 }
 
 // FolderAbsPath of the fileserver folder
-func (o *Options) FolderAbsPath() string {
-	abspath, err := filepath.Abs(o.Folder)
+func (options *Options) FolderAbsPath() string {
+	abspath, err := filepath.Abs(options.Folder)
 	if err != nil {
-		return o.Folder
+		return options.Folder
 	}
 	return abspath
 }

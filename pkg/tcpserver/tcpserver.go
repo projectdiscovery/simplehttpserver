@@ -11,6 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const readTimeout = 5
+
 // Options of the tcp server
 type Options struct {
 	Listen      string
@@ -24,12 +26,12 @@ type Options struct {
 
 // TCPServer instance
 type TCPServer struct {
-	options  Options
+	options  *Options
 	listener net.Listener
 }
 
 // New tcp server instance with specified options
-func New(options Options) (*TCPServer, error) {
+func New(options *Options) (*TCPServer, error) {
 	return &TCPServer{options: options}, nil
 }
 
@@ -50,11 +52,11 @@ func (t *TCPServer) ListenAndServe() error {
 }
 
 func (t *TCPServer) handleConnection(conn net.Conn) error {
-	defer conn.Close()
+	defer conn.Close() //nolint
 
 	buf := make([]byte, 4096)
 	for {
-		if err := conn.SetReadDeadline(time.Now().Add(time.Duration(5 * time.Second))); err != nil {
+		if err := conn.SetReadDeadline(time.Now().Add(readTimeout * time.Second)); err != nil {
 			gologger.Info().Msgf("%s\n", err)
 		}
 		_, err := conn.Read(buf)
@@ -77,7 +79,7 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 	}
 }
 
-// ListenAndServe requests over tls
+// ListenAndServeTLS requests over tls
 func (t *TCPServer) ListenAndServeTLS() error {
 	var tlsConfig *tls.Config
 	if t.options.Certificate != "" && t.options.Key != "" {

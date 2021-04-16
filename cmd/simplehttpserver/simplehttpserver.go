@@ -16,5 +16,5 @@ func main() {
 	if err := r.Run(); err != nil {
 		gologger.Info().Msgf("%s\n", err)
 	}
-	defer r.Close()
+	defer r.Close() //nolint
 }
