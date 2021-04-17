@@ -32,12 +32,13 @@ func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
 	EnableUpload = options.EnableUpload
 	EnableVerbose = options.Verbose
-	layers := h.loglayer(http.FileServer(http.Dir(options.Folder)))
+	h.layers = h.loglayer(http.FileServer(http.Dir(options.Folder)))
 	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
-		layers = h.loglayer(h.basicauthlayer(http.FileServer(http.Dir(options.Folder))))
+		h.layers = h.loglayer(h.basicauthlayer(http.FileServer(http.Dir(options.Folder))))
 	}
+	h.options = options
 
-	return &HTTPServer{options: options, layers: layers}, nil
+	return &h, nil
 }
 
 // ListenAndServe requests over http
