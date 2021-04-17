@@ -53,10 +53,10 @@ This will display help for the tool. Here are all the switches it supports.
 | ----------- | -------------------------------------------------------------------- | ------------------------------------------------- |
 | listen      | Configure listening ip:port (default 127.0.0.1:8000)                 | simplehttpserver -listen 127.0.0.1:8000           |
 | path        | Fileserver folder (default current directory)                        | simplehttpserver -path /var/docs                  |
-| verbose     | Verbose (dump request/response, default false)                       | simplehttpserver -v                               |
+| verbose     | Verbose (dump request/response, default false)                       | simplehttpserver -verbose                         |
 | tcp         | TCP server (default 127.0.0.1:8000)                                  | simplehttpserver -tcp 127.0.0.1:8000              |
 | tls         | Enable TLS for TCP server                                            | simplehttpserver -tls                             |
-| rules       | File containing yaml rules                                           | simplehttpserver -rules rule.yaml                 |              |
+| rules       | File containing yaml rules                                           | simplehttpserver -rules rule.yaml                 |
 | upload      | Enable file upload in case of http server                            | simplehttpserver -upload                          |
 | https       | Enable HTTPS in case of http server                                  | simplehttpserver -https                           |
 | cert        | HTTPS/TLS certificate (self generated if not specified)              | simplehttpserver -cert cert.pem                   |
