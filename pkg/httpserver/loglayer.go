@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"path"
+	"path/filepath"
 
 	"github.com/projectdiscovery/gologger"
 )
@@ -24,13 +25,54 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 
 		// Handles file write if enabled
 		if EnableUpload && r.Method == http.MethodPut {
-			data, err := ioutil.ReadAll(r.Body)
+			// sandbox - calcolate absolute path
+			if t.options.Sandbox {
+				absPath, err := filepath.Abs(filepath.Join(t.options.Folder, r.URL.Path))
+				if err != nil {
+					gologger.Print().Msgf("%s\n", err)
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+				// check if the path is within the configured folder
+				pattern := t.options.Folder + string(filepath.Separator) + "*"
+				matched, err := filepath.Match(pattern, absPath)
+				if err != nil {
+					gologger.Print().Msgf("%s\n", err)
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				} else if !matched {
+					gologger.Print().Msg("pointing to unauthorized directory")
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+			}
+
+			var (
+				data []byte
+				err  error
+			)
+			if t.options.Sandbox {
+				maxFileSize := toMb(t.options.MaxFileSize)
+				// check header content length
+				if r.ContentLength > maxFileSize {
+					gologger.Print().Msg("request too large")
+					return
+				}
+				// body max length
+				r.Body = http.MaxBytesReader(w, r.Body, maxFileSize)
+			}
+
+			data, err = ioutil.ReadAll(r.Body)
 			if err != nil {
 				gologger.Print().Msgf("%s\n", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 			err = handleUpload(path.Base(r.URL.Path), data)
 			if err != nil {
 				gologger.Print().Msgf("%s\n", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 		}
 
