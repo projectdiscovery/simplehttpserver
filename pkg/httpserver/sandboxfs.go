@@ -6,11 +6,13 @@ import (
 	"path/filepath"
 )
 
+// SandboxFileSystem implements superbasic security checks
 type SandboxFileSystem struct {
 	fs         http.FileSystem
 	RootFolder string
 }
 
+// Open performs basic security checks before providing folder/file content
 func (sbfs SandboxFileSystem) Open(path string) (http.File, error) {
 	abspath, err := filepath.Abs(filepath.Join(sbfs.RootFolder, path))
 	if err != nil {
