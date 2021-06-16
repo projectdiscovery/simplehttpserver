@@ -68,7 +68,7 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			err = handleUpload(path.Base(r.URL.Path), data)
+			err = handleUpload(t.options.Folder, path.Base(r.URL.Path), data)
 			if err != nil {
 				gologger.Print().Msgf("%s\n", err)
 				w.WriteHeader(http.StatusInternalServerError)

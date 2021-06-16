@@ -40,7 +40,11 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.EnableTCP, "tcp", false, "TCP Server")
 	flag.BoolVar(&options.TCPWithTLS, "tls", false, "Enable TCP TLS")
 	flag.StringVar(&options.RulesFile, "rules", "", "Rules yaml file")
-	flag.StringVar(&options.Folder, "path", ".", "Folder")
+	currentPath := "."
+	if p, err := os.Getwd(); err == nil {
+		currentPath = p
+	}
+	flag.StringVar(&options.Folder, "path", currentPath, "Folder")
 	flag.BoolVar(&options.EnableUpload, "upload", false, "Enable upload via PUT")
 	flag.BoolVar(&options.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&options.TLSCertificate, "cert", "", "HTTPS Certificate")
