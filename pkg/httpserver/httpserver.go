@@ -1,7 +1,10 @@
 package httpserver
 
 import (
+	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/projectdiscovery/sslcert"
 )
@@ -19,6 +22,8 @@ type Options struct {
 	BasicAuthPassword string
 	BasicAuthReal     string
 	Verbose           bool
+	Sandbox           bool
+	MaxFileSize       int // 50Mb
 }
 
 // HTTPServer instance
@@ -32,9 +37,22 @@ func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
 	EnableUpload = options.EnableUpload
 	EnableVerbose = options.Verbose
-	h.layers = h.loglayer(http.FileServer(http.Dir(options.Folder)))
+	folder, err := filepath.Abs(options.Folder)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(folder); os.IsNotExist(err) {
+		return nil, errors.New("path does not exist")
+	}
+	options.Folder = folder
+	var dir http.FileSystem
+	dir = http.Dir(options.Folder)
+	if options.Sandbox {
+		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
+	}
+	h.layers = h.loglayer(http.FileServer(dir))
 	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
-		h.layers = h.loglayer(h.basicauthlayer(http.FileServer(http.Dir(options.Folder))))
+		h.layers = h.loglayer(h.basicauthlayer(http.FileServer(dir)))
 	}
 	h.options = options
 

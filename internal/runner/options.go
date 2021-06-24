@@ -29,6 +29,8 @@ type Options struct {
 	TCPWithTLS     bool
 	Version        bool
 	Silent         bool
+	Sandbox        bool
+	MaxFileSize    int
 }
 
 // ParseOptions parses the command line options for application
@@ -38,7 +40,11 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.EnableTCP, "tcp", false, "TCP Server")
 	flag.BoolVar(&options.TCPWithTLS, "tls", false, "Enable TCP TLS")
 	flag.StringVar(&options.RulesFile, "rules", "", "Rules yaml file")
-	flag.StringVar(&options.Folder, "path", ".", "Folder")
+	currentPath := "."
+	if p, err := os.Getwd(); err == nil {
+		currentPath = p
+	}
+	flag.StringVar(&options.Folder, "path", currentPath, "Folder")
 	flag.BoolVar(&options.EnableUpload, "upload", false, "Enable upload via PUT")
 	flag.BoolVar(&options.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&options.TLSCertificate, "cert", "", "HTTPS Certificate")
@@ -49,6 +55,8 @@ func ParseOptions() *Options {
 	flag.StringVar(&options.Realm, "realm", "Please enter username and password", "Realm")
 	flag.BoolVar(&options.Version, "version", false, "Show version of the software")
 	flag.BoolVar(&options.Silent, "silent", false, "Show only results in the output")
+	flag.BoolVar(&options.Sandbox, "sandbox", false, "Enable sandbox mode")
+	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
 
 	flag.Parse()
 
