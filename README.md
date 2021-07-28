@@ -163,6 +163,10 @@ rules:
     response: 250 Accepted
 ```
 
+## Note
+
+- This project is intended for development purposes only; it should not be used in production.
+
 # Thanks
 
 SimpleHTTPserver is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team.
