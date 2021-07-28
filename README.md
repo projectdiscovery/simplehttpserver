@@ -26,9 +26,9 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 
 # Features
 
-- HTTPS support
-- File server in arbitrary directory
-- Full request/response dump
+- HTTP/S Web Server
+- File Server with arbitrary directory support
+- HTTP request/response dump
 - Configurable ip address and listening port
 - Configurable HTTP/TCP server with customizable response via YAML template
 
@@ -38,7 +38,7 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 SimpleHTTPserver requires **go1.14+** to install successfully. Run the following command to get the repo - 
 
 ```sh
-▶ GO111MODULE=on go get -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver
+GO111MODULE=on go get -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver
 ```
 
 # Usage
@@ -49,30 +49,33 @@ simplehttpserver -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag        | Description                                                          | Example                                           |
-| ----------- | -------------------------------------------------------------------- | ------------------------------------------------- |
-| listen      | Configure listening ip:port (default 127.0.0.1:8000)                 | simplehttpserver -listen 127.0.0.1:8000           |
-| path        | Fileserver folder (default current directory)                        | simplehttpserver -path /var/docs                  |
-| verbose     | Verbose (dump request/response, default false)                       | simplehttpserver -verbose                         |
-| tcp         | TCP server (default 127.0.0.1:8000)                                  | simplehttpserver -tcp 127.0.0.1:8000              |
-| tls         | Enable TLS for TCP server                                            | simplehttpserver -tls                             |
-| rules       | File containing yaml rules                                           | simplehttpserver -rules rule.yaml                 |
-| upload      | Enable file upload in case of http server                            | simplehttpserver -upload                          |
-| https       | Enable HTTPS in case of http server                                  | simplehttpserver -https                           |
-| cert        | HTTPS/TLS certificate (self generated if not specified)              | simplehttpserver -cert cert.pem                   |
-| key         | HTTPS/TLS certificate private key (self generated if not specified)  | simplehttpserver -key cert.key                    |
-| domain      | Domain name to use for the self-generated certificate                | simplehttpserver -domain projectdiscovery.io      |
-| basic-auth  | Basic auth (username:password)                                       | simplehttpserver -basic-auth user:password        |
-| realm       | Basic auth message                                                   | simplehttpserver -realm "insert the credentials"  |
-| version     | Show version                                                         | simplehttpserver -version                         |
-| silent      | Show only results                                                    | simplehttpserver -silent                          |
+| Flag          | Description                                             | Example                                          |
+| ------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| listen        | Configure listening ip:port (default 127.0.0.1:8000)    | simplehttpserver -listen 127.0.0.1:8000          |
+| path          | Fileserver folder (default current directory)           | simplehttpserver -path /var/docs                 |
+| verbose       | Verbose (dump request/response, default false)          | simplehttpserver -verbose                        |
+| tcp           | TCP server (default 127.0.0.1:8000)                     | simplehttpserver -tcp 127.0.0.1:8000             |
+| tls           | Enable TLS for TCP server                               | simplehttpserver -tls                            |
+| rules         | File containing yaml rules                              | simplehttpserver -rules rule.yaml                |
+| upload        | Enable file upload in case of http server               | simplehttpserver -upload                         |
+| max-file-size | Max Upload File Size (default 50 MB)                    | simplehttpserver -max-file-size 100              |
+| sandbox       | Enable sandbox mode                                     | simplehttpserver -sandbox                        |
+| https         | Enable HTTPS in case of http server                     | simplehttpserver -https                          |
+| cert          | HTTPS/TLS certificate (self generated if not specified) | simplehttpserver -cert cert.pem                  |
+| key           | HTTPS/TLS certificate private key                       | simplehttpserver -key cert.key                   |
+| domain        | Domain name to use for the self-generated certificate   | simplehttpserver -domain projectdiscovery.io     |
+| basic-auth    | Basic auth (username:password)                          | simplehttpserver -basic-auth user:password       |
+| realm         | Basic auth message                                      | simplehttpserver -realm "insert the credentials" |
+| version       | Show version                                            | simplehttpserver -version                        |
+| silent        | Show only results                                       | simplehttpserver -silent                         |
 
 ### Running simplehttpserver in the current folder  
 
 This will run the tool exposing the current directory on port 8000 
 
 ```sh
-▶ simplehttpserver 
+simplehttpserver
+
 2021/01/11 21:40:48 Serving . on http://0.0.0.0:8000/...
 2021/01/11 21:41:15 [::1]:50181 "GET / HTTP/1.1" 200 383
 2021/01/11 21:41:15 [::1]:50181 "GET /favicon.ico HTTP/1.1" 404 19
@@ -83,7 +86,8 @@ This will run the tool exposing the current directory on port 8000
 This will run the tool exposing the current directory on port 8000 over HTTPS with user provided certificate:
 
 ```sh
-▶ simplehttpserver -https -cert cert.pen -key cert.key
+simplehttpserver -https -cert cert.pen -key cert.key
+
 2021/01/11 21:40:48 Serving . on http://0.0.0.0:8000/...
 2021/01/11 21:41:15 [::1]:50181 "GET / HTTP/1.1" 200 383
 2021/01/11 21:41:15 [::1]:50181 "GET /favicon.ico HTTP/1.1" 404 19
@@ -91,7 +95,8 @@ This will run the tool exposing the current directory on port 8000 over HTTPS wi
 
 Instead, to run with self-signed certificate and specific domain name:
 ```sh
-▶ simplehttpserver -https -domain localhost
+simplehttpserver -https -domain localhost
+
 2021/01/11 21:40:48 Serving . on http://0.0.0.0:8000/...
 2021/01/11 21:41:15 [::1]:50181 "GET / HTTP/1.1" 200 383
 2021/01/11 21:41:15 [::1]:50181 "GET /favicon.ico HTTP/1.1" 404 19
@@ -102,13 +107,14 @@ Instead, to run with self-signed certificate and specific domain name:
 This will run the tool and will request the user to enter username and password before authorizing file uploads
 
 ```sh
-▶ simplehttpserver -basic-auth root:root -upload
+simplehttpserver -basic-auth root:root -upload
+
 2021/01/11 21:40:48 Serving . on http://0.0.0.0:8000/...
 ```
 
 To upload files use the following curl request with basic auth header:
 ```sh
-▶ curl -v --user 'root:root' --upload-file file.txt http://localhost:8000/file.txt
+curl -v --user 'root:root' --upload-file file.txt http://localhost:8000/file.txt
 ```
 
 ### Running TCP server with custom responses
@@ -116,7 +122,7 @@ To upload files use the following curl request with basic auth header:
 This will run the tool as TLS TCP server and enable custom responses based on YAML templates:
 
 ```sh
-▶ simplehttpserver -rule rules.yaml -tcp -tls -domain localhost
+simplehttpserver -rule rules.yaml -tcp -tls -domain localhost
 ```
 
 The rules are written as follows:
