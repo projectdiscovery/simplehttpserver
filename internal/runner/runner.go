@@ -57,6 +57,8 @@ func New(options *Options) (*Runner, error) {
 		BasicAuthPassword: r.options.password,
 		BasicAuthReal:     r.options.Realm,
 		Verbose:           r.options.Verbose,
+		Sandbox:           r.options.Sandbox,
+		MaxFileSize:       r.options.MaxFileSize,
 	})
 	if err != nil {
 		return nil, err
