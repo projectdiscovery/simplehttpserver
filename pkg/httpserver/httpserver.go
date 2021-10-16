@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"crypto/tls"
 	"errors"
 	"net/http"
 	"os"
@@ -23,7 +24,8 @@ type Options struct {
 	BasicAuthReal     string
 	Verbose           bool
 	Sandbox           bool
-	MaxFileSize       int // 50Mb
+	MaxFileSize       int
+	HTTP1Only         bool
 }
 
 // HTTPServer instance
@@ -59,9 +61,20 @@ func New(options *Options) (*HTTPServer, error) {
 	return &h, nil
 }
 
+func (t *HTTPServer) makeHTTPServer(tlsConfig *tls.Config) *http.Server {
+	httpServer := &http.Server{Addr: t.options.ListenAddress}
+	if t.options.HTTP1Only {
+		httpServer.TLSNextProto = make(map[string]func(*http.Server, *tls.Conn, http.Handler))
+	}
+	httpServer.TLSConfig = tlsConfig
+	httpServer.Handler = t.layers
+	return httpServer
+}
+
 // ListenAndServe requests over http
 func (t *HTTPServer) ListenAndServe() error {
-	return http.ListenAndServe(t.options.ListenAddress, t.layers)
+	httpServer := t.makeHTTPServer(nil)
+	return httpServer.ListenAndServe()
 }
 
 // ListenAndServeTLS requests over https
@@ -73,11 +86,7 @@ func (t *HTTPServer) ListenAndServeTLS() error {
 		if err != nil {
 			return err
 		}
-		httpServer := &http.Server{
-			Addr:      t.options.ListenAddress,
-			TLSConfig: tlsConfig,
-		}
-		httpServer.Handler = t.layers
+		httpServer := t.makeHTTPServer(tlsConfig)
 		return httpServer.ListenAndServeTLS("", "")
 	}
 	return http.ListenAndServeTLS(t.options.ListenAddress, t.options.Certificate, t.options.CertificateKey, t.layers)

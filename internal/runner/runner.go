@@ -59,6 +59,7 @@ func New(options *Options) (*Runner, error) {
 		Verbose:           r.options.Verbose,
 		Sandbox:           r.options.Sandbox,
 		MaxFileSize:       r.options.MaxFileSize,
+		HTTP1Only:         r.options.HTTP1Only,
 	})
 	if err != nil {
 		return nil, err
