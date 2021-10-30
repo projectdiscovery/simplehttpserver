@@ -24,6 +24,7 @@ type Options struct {
 	Verbose           bool
 	Sandbox           bool
 	MaxFileSize       int // 50Mb
+	MaxDumpBodySize   int64
 }
 
 // HTTPServer instance
