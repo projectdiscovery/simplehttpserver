@@ -24,8 +24,9 @@ type Options struct {
 	BasicAuthReal     string
 	Verbose           bool
 	Sandbox           bool
-	MaxFileSize       int
 	HTTP1Only         bool
+	MaxFileSize       int // 50Mb
+	MaxDumpBodySize   int64
 }
 
 // HTTPServer instance

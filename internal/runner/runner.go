@@ -5,6 +5,7 @@ import (
 	"github.com/projectdiscovery/simplehttpserver/pkg/binder"
 	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
+	"github.com/projectdiscovery/simplehttpserver/pkg/unit"
 )
 
 // Runner is a client for running the enumeration process.
@@ -60,6 +61,7 @@ func New(options *Options) (*Runner, error) {
 		Sandbox:           r.options.Sandbox,
 		MaxFileSize:       r.options.MaxFileSize,
 		HTTP1Only:         r.options.HTTP1Only,
+		MaxDumpBodySize:   unit.ToMb(r.options.MaxDumpBodySize),
 	})
 	if err != nil {
 		return nil, err
