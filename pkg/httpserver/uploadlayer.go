@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/simplehttpserver/pkg/unit"
 )
 
 // uploadlayer handles PUT requests and save the file to disk
@@ -44,7 +45,7 @@ func (t *HTTPServer) uploadlayer(handler http.Handler) http.Handler {
 				err  error
 			)
 			if t.options.Sandbox {
-				maxFileSize := toMb(t.options.MaxFileSize)
+				maxFileSize := unit.ToMb(t.options.MaxFileSize)
 				// check header content length
 				if r.ContentLength > maxFileSize {
 					gologger.Print().Msg("request too large")
