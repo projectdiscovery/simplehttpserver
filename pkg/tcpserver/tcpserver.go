@@ -59,14 +59,14 @@ func (t *TCPServer) handleConnection(conn net.Conn) error {
 		if err := conn.SetReadDeadline(time.Now().Add(readTimeout * time.Second)); err != nil {
 			gologger.Info().Msgf("%s\n", err)
 		}
-		_, err := conn.Read(buf)
+		n, err := conn.Read(buf)
 		if err != nil {
 			return err
 		}
 
-		gologger.Print().Msgf("%s\n", buf)
+		gologger.Print().Msgf("%s\n", buf[:n])
 
-		resp, err := t.BuildResponse(buf)
+		resp, err := t.BuildResponse(buf[:n])
 		if err != nil {
 			return err
 		}
