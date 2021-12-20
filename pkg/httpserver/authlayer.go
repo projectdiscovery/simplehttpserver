@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (t *HTTPServer) basicauthlayer(handler http.Handler) http.HandlerFunc {
+func (t *HTTPServer) basicauthlayer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
 		if !ok || user != t.options.BasicAuthUsername || pass != t.options.BasicAuthPassword {

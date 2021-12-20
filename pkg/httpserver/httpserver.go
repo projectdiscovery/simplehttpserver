@@ -35,6 +35,9 @@ type HTTPServer struct {
 	layers  http.Handler
 }
 
+// LayerHandler is the interface of all layer funcs
+type Middleware func(http.Handler) http.Handler
+
 // New http server instance with options
 func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
@@ -53,10 +56,25 @@ func New(options *Options) (*HTTPServer, error) {
 	if options.Sandbox {
 		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
 	}
-	h.layers = h.loglayer(http.FileServer(dir))
-	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
-		h.layers = h.loglayer(h.basicauthlayer(http.FileServer(dir)))
+
+	httpHandler := http.FileServer(dir)
+	addHandler := func(newHandler Middleware) {
+		httpHandler = newHandler(httpHandler)
 	}
+
+	// middleware
+	if options.EnableUpload {
+		addHandler(h.uploadlayer)
+	}
+
+	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
+		addHandler(h.basicauthlayer)
+	}
+
+	httpHandler = h.loglayer(httpHandler)
+
+	// add handler
+	h.layers = httpHandler
 	h.options = options
 
 	return &h, nil
