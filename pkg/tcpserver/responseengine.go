@@ -6,9 +6,12 @@ import (
 
 // BuildResponse according to rules
 func (t *TCPServer) BuildResponse(data []byte) ([]byte, error) {
+	t.mux.RLock()
+	defer t.mux.RUnlock()
+
 	// Process all the rules
-	for _, rule := range t.options.rules {
-		if rule.matchRegex.Match(data) {
+	for _, rule := range t.rules {
+		if rule.MatchInput(data) {
 			return []byte(rule.Response), nil
 		}
 	}

@@ -42,6 +42,12 @@ func New(options *Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
+		watcher, err := watchFile(r.options.RulesFile, serverTCP.LoadTemplate)
+		if err != nil {
+			return nil, err
+		}
+		defer watcher.Close()
+
 		r.serverTCP = serverTCP
 		return &r, nil
 	}
