@@ -80,6 +80,10 @@ func New(options *Options) (*Runner, error) {
 // Run logic
 func (r *Runner) Run() error {
 	if r.options.EnableTCP {
+		if r.options.TCPWithTLS {
+			gologger.Print().Msgf("Serving TCP rule based tls server on tcp://%s", r.options.ListenAddress)
+			return r.serverTCP.ListenAndServeTLS()
+		}
 		gologger.Print().Msgf("Serving TCP rule based server on tcp://%s", r.options.ListenAddress)
 		return r.serverTCP.ListenAndServe()
 	}
