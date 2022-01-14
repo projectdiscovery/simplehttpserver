@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httputil"
-
+	"time"
 	"github.com/projectdiscovery/gologger"
 )
 
@@ -32,9 +32,9 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 		if EnableVerbose {
 			headers := new(bytes.Buffer)
 			lrw.Header().Write(headers) //nolint
-			gologger.Print().Msgf("\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
+			gologger.Print().Msgf("\n[%s]\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
-			gologger.Print().Msgf("%s \"%s %s %s\" %d %d", r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
+			gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
 		}
 	})
 }
