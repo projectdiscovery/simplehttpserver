@@ -19,3 +19,30 @@ archives:
       format_overrides:
           - goos: windows
             format: zip
+
+snapcrafts:
+  - id: simplehttpserver
+    replacements:
+      darwin: macOS
+    name: simplehttpserver
+    publish: false
+    summary: Go client to communicate with Chaos dataset API.
+    description: |
+      Go client to communicate with Chaos dataset API.
+    grade: stable
+    confinement: strict
+    license: MIT
+    base: core18
+    apps:
+      simplehttpserver:
+        command: simplehttpserver
+        plugs:
+          - home
+          - network
+          - removable-media
+          - dot-simplehttpserver
+    plugs:
+      dot-simplehttpserver:
+        interface: personal-files
+        write:
+          - $HOME/.config/simplehttpserver
