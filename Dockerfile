@@ -1,5 +1,5 @@
-FROM golang:1.18.1-alpine as build-env
-RUN GO111MODULE=on go get -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver
+FROM golang:1.18-alpine as build-env
+RUN go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@latest
 
 FROM alpine:latest
 RUN apk add --no-cache bind-tools ca-certificates

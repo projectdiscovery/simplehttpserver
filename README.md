@@ -35,10 +35,10 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 
 # Installing SimpleHTTPserver
 
-SimpleHTTPserver requires **go1.14+** to install successfully. Run the following command to get the repo - 
+SimpleHTTPserver requires **go1.17+** to install successfully. Run the following command to get the repo - 
 
 ```sh
-GO111MODULE=on go get -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver
+go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@latest
 ```
 
 # Usage
@@ -49,25 +49,25 @@ simplehttpserver -h
 
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag          | Description                                             | Example                                          |
-| ------------- | ------------------------------------------------------- | ------------------------------------------------ |
-| listen        | Configure listening ip:port (default 127.0.0.1:8000)    | simplehttpserver -listen 127.0.0.1:8000          |
-| path          | Fileserver folder (default current directory)           | simplehttpserver -path /var/docs                 |
-| verbose       | Verbose (dump request/response, default false)          | simplehttpserver -verbose                        |
-| tcp           | TCP server (default 127.0.0.1:8000)                     | simplehttpserver -tcp 127.0.0.1:8000             |
-| tls           | Enable TLS for TCP server                               | simplehttpserver -tls                            |
-| rules         | File containing yaml rules                              | simplehttpserver -rules rule.yaml                |
-| upload        | Enable file upload in case of http server               | simplehttpserver -upload                         |
-| max-file-size | Max Upload File Size (default 50 MB)                    | simplehttpserver -max-file-size 100              |
-| sandbox       | Enable sandbox mode                                     | simplehttpserver -sandbox                        |
-| https         | Enable HTTPS in case of http server                     | simplehttpserver -https                          |
-| cert          | HTTPS/TLS certificate (self generated if not specified) | simplehttpserver -cert cert.pem                  |
-| key           | HTTPS/TLS certificate private key                       | simplehttpserver -key cert.key                   |
-| domain        | Domain name to use for the self-generated certificate   | simplehttpserver -domain projectdiscovery.io     |
-| basic-auth    | Basic auth (username:password)                          | simplehttpserver -basic-auth user:password       |
-| realm         | Basic auth message                                      | simplehttpserver -realm "insert the credentials" |
-| version       | Show version                                            | simplehttpserver -version                        |
-| silent        | Show only results                                       | simplehttpserver -silent                         |
+| Flag             | Description                                             | Example                                            |
+|------------------|---------------------------------------------------------|----------------------------------------------------|
+| `-listen`        | Configure listening ip:port (default 127.0.0.1:8000)    | `simplehttpserver -listen 127.0.0.1:8000`          |
+| `-path`          | Fileserver folder (default current directory)           | `simplehttpserver -path /var/docs`                 |
+| `-verbose`       | Verbose (dump request/response, default false)          | `simplehttpserver -verbose`                        |
+| `-tcp`           | TCP server (default 127.0.0.1:8000)                     | `simplehttpserver -tcp 127.0.0.1:8000`             |
+| `-tls`           | Enable TLS for TCP server                               | `simplehttpserver -tls`                            |
+| `-rules`         | File containing yaml rules                              | `simplehttpserver -rules rule.yaml`                |
+| `-upload`        | Enable file upload in case of http server               | `simplehttpserver -upload`                         |
+| `-max-file-size` | Max Upload File Size (default 50 MB)                    | `simplehttpserver -max-file-size 100`              |
+| `-sandbox`       | Enable sandbox mode                                     | `simplehttpserver -sandbox`                        |
+| `-https`         | Enable HTTPS in case of http server                     | `simplehttpserver -https`                          |
+| `-cert`          | HTTPS/TLS certificate (self generated if not specified) | `simplehttpserver -cert cert.pem`                  |
+| `-key`           | HTTPS/TLS certificate private key                       | `simplehttpserver -key cert.key`                   |
+| `-domain`        | Domain name to use for the self-generated certificate   | `simplehttpserver -domain projectdiscovery.io`     |
+| `-basic-auth`    | Basic auth (username:password)                          | `simplehttpserver -basic-auth user:password`       |
+| `-realm`         | Basic auth message                                      | `simplehttpserver -realm "insert the credentials"` |
+| `-version`       | Show version                                            | `simplehttpserver -version`                        |
+| `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
 
 ### Running simplehttpserver in the current folder  
 
