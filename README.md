@@ -61,6 +61,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-max-file-size` | Max Upload File Size (default 50 MB)                    | `simplehttpserver -max-file-size 100`              |
 | `-sandbox`       | Enable sandbox mode                                     | `simplehttpserver -sandbox`                        |
 | `-https`         | Enable HTTPS in case of http server                     | `simplehttpserver -https`                          |
+| `-http1`         | Enable only HTTP1                                       | `simplehttpserver -http1`                          |
 | `-cert`          | HTTPS/TLS certificate (self generated if not specified) | `simplehttpserver -cert cert.pem`                  |
 | `-key`           | HTTPS/TLS certificate private key                       | `simplehttpserver -key cert.key`                   |
 | `-domain`        | Domain name to use for the self-generated certificate   | `simplehttpserver -domain projectdiscovery.io`     |
