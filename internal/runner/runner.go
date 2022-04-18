@@ -5,6 +5,7 @@ import (
 	"github.com/projectdiscovery/simplehttpserver/pkg/binder"
 	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 	"github.com/projectdiscovery/simplehttpserver/pkg/tcpserver"
+	"github.com/projectdiscovery/simplehttpserver/pkg/unit"
 )
 
 // Runner is a client for running the enumeration process.
@@ -41,6 +42,12 @@ func New(options *Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
+		watcher, err := watchFile(r.options.RulesFile, serverTCP.LoadTemplate)
+		if err != nil {
+			return nil, err
+		}
+		defer watcher.Close()
+
 		r.serverTCP = serverTCP
 		return &r, nil
 	}
@@ -59,6 +66,8 @@ func New(options *Options) (*Runner, error) {
 		Verbose:           r.options.Verbose,
 		Sandbox:           r.options.Sandbox,
 		MaxFileSize:       r.options.MaxFileSize,
+		HTTP1Only:         r.options.HTTP1Only,
+		MaxDumpBodySize:   unit.ToMb(r.options.MaxDumpBodySize),
 	})
 	if err != nil {
 		return nil, err
@@ -71,6 +80,10 @@ func New(options *Options) (*Runner, error) {
 // Run logic
 func (r *Runner) Run() error {
 	if r.options.EnableTCP {
+		if r.options.TCPWithTLS {
+			gologger.Print().Msgf("Serving TCP rule based tls server on tcp://%s", r.options.ListenAddress)
+			return r.serverTCP.ListenAndServeTLS()
+		}
 		gologger.Print().Msgf("Serving TCP rule based server on tcp://%s", r.options.ListenAddress)
 		return r.serverTCP.ListenAndServe()
 	}

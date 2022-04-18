@@ -31,6 +31,8 @@ type Options struct {
 	Silent         bool
 	Sandbox        bool
 	MaxFileSize    int
+	HTTP1Only      bool
+	MaxDumpBodySize int
 }
 
 // ParseOptions parses the command line options for application
@@ -56,8 +58,9 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.Version, "version", false, "Show version of the software")
 	flag.BoolVar(&options.Silent, "silent", false, "Show only results in the output")
 	flag.BoolVar(&options.Sandbox, "sandbox", false, "Enable sandbox mode")
+	flag.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1")
 	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
-
+	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
 	flag.Parse()
 
 	// Read the inputs and configure the logging

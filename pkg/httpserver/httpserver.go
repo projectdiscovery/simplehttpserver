@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"crypto/tls"
 	"errors"
 	"net/http"
 	"os"
@@ -23,7 +24,9 @@ type Options struct {
 	BasicAuthReal     string
 	Verbose           bool
 	Sandbox           bool
+	HTTP1Only         bool
 	MaxFileSize       int // 50Mb
+	MaxDumpBodySize   int64
 }
 
 // HTTPServer instance
@@ -31,6 +34,9 @@ type HTTPServer struct {
 	options *Options
 	layers  http.Handler
 }
+
+// LayerHandler is the interface of all layer funcs
+type Middleware func(http.Handler) http.Handler
 
 // New http server instance with options
 func New(options *Options) (*HTTPServer, error) {
@@ -50,18 +56,44 @@ func New(options *Options) (*HTTPServer, error) {
 	if options.Sandbox {
 		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
 	}
-	h.layers = h.loglayer(http.FileServer(dir))
-	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
-		h.layers = h.loglayer(h.basicauthlayer(http.FileServer(dir)))
+
+	httpHandler := http.FileServer(dir)
+	addHandler := func(newHandler Middleware) {
+		httpHandler = newHandler(httpHandler)
 	}
+
+	// middleware
+	if options.EnableUpload {
+		addHandler(h.uploadlayer)
+	}
+
+	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
+		addHandler(h.basicauthlayer)
+	}
+
+	httpHandler = h.loglayer(httpHandler)
+
+	// add handler
+	h.layers = httpHandler
 	h.options = options
 
 	return &h, nil
 }
 
+func (t *HTTPServer) makeHTTPServer(tlsConfig *tls.Config) *http.Server {
+	httpServer := &http.Server{Addr: t.options.ListenAddress}
+	if t.options.HTTP1Only {
+		httpServer.TLSNextProto = make(map[string]func(*http.Server, *tls.Conn, http.Handler))
+	}
+	httpServer.TLSConfig = tlsConfig
+	httpServer.Handler = t.layers
+	return httpServer
+}
+
 // ListenAndServe requests over http
 func (t *HTTPServer) ListenAndServe() error {
-	return http.ListenAndServe(t.options.ListenAddress, t.layers)
+	httpServer := t.makeHTTPServer(nil)
+	return httpServer.ListenAndServe()
 }
 
 // ListenAndServeTLS requests over https
@@ -73,11 +105,7 @@ func (t *HTTPServer) ListenAndServeTLS() error {
 		if err != nil {
 			return err
 		}
-		httpServer := &http.Server{
-			Addr:      t.options.ListenAddress,
-			TLSConfig: tlsConfig,
-		}
-		httpServer.Handler = t.layers
+		httpServer := t.makeHTTPServer(tlsConfig)
 		return httpServer.ListenAndServeTLS("", "")
 	}
 	return http.ListenAndServeTLS(t.options.ListenAddress, t.options.Certificate, t.options.CertificateKey, t.layers)

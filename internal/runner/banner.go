@@ -8,11 +8,11 @@ const banner = `
   \__ \/ / __ -__ \/ __ \/ / _ \/ /_/ / / /   / / / /_/ / ___/ _ \/ ___/ | / / _ \/ ___/
  ___/ / / / / / / / /_/ / /  __/ __  / / /   / / / ____(__  )  __/ /   | |/ /  __/ /    
 /____/_/_/ /_/ /_/ .___/_/\___/_/ /_/ /_/   /_/ /_/   /____/\___/_/    |___/\___/_/     
-                /_/                                                       - v0.0.4
+                /_/                                                       - v0.0.5
 `
 
 // Version is the current version
-const Version = `0.0.4`
+const Version = `0.0.5`
 
 // showBanner is used to show the banner to the user
 func showBanner() {

@@ -61,6 +61,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-max-file-size` | Max Upload File Size (default 50 MB)                    | `simplehttpserver -max-file-size 100`              |
 | `-sandbox`       | Enable sandbox mode                                     | `simplehttpserver -sandbox`                        |
 | `-https`         | Enable HTTPS in case of http server                     | `simplehttpserver -https`                          |
+| `-http1`         | Enable only HTTP1                                       | `simplehttpserver -http1`                          |
 | `-cert`          | HTTPS/TLS certificate (self generated if not specified) | `simplehttpserver -cert cert.pem`                  |
 | `-key`           | HTTPS/TLS certificate private key                       | `simplehttpserver -key cert.key`                   |
 | `-domain`        | Domain name to use for the self-generated certificate   | `simplehttpserver -domain projectdiscovery.io`     |
@@ -128,7 +129,9 @@ simplehttpserver -rule rules.yaml -tcp -tls -domain localhost
 The rules are written as follows:
 ```yaml
 rules:
-  - match: regex
+  - match: regex-match
+    match-contains: literal-match
+    name: rule-name
     response: response data
 ```
 
@@ -137,6 +140,7 @@ For example to handle two different paths simulating an HTTP server or SMTP comm
 rules:
   # HTTP Requests
   - match: GET /path1
+    name: redirect
     response: |
               HTTP/1.0 200 OK
               Server: httpd/2.0
@@ -149,6 +153,7 @@ rules:
               <HTML><HEAD><script>top.location.href='/Main_Login.asp';</script>
               </HEAD></HTML>
   - match: GET /path2
+    name: "404"
     response: |
               HTTP/1.0 404 OK
               Server: httpd/2.0
@@ -156,6 +161,7 @@ rules:
               <HTML><HEAD></HEAD><BODY>Not found</BODY></HTML>
   # SMTP Commands
   - match: "EHLO example.com"
+    name: smtp 
     response: |
               250-localhost Nice to meet you, [127.0.0.1]
               250-PIPELINING
@@ -167,6 +173,14 @@ rules:
     response: 250 Accepted
   - match: "RCPT TO: <test@example.com>"
     response: 250 Accepted
+
+  - match-contains: !!binary |
+      MAwCAQFgBwIBAwQAgAA=
+    name: "ldap"
+    # Request:  300c 0201 0160 0702 0103 0400 8000       0....`........
+    # Response: 300c 0201 0161 070a 0100 0400 0400       0....a........
+    response: !!binary |
+      MAwCAQFhBwoBAAQABAA=
 ```
 
 ## Note
