@@ -27,6 +27,7 @@ type Options struct {
 	HTTP1Only         bool
 	MaxFileSize       int // 50Mb
 	MaxDumpBodySize   int64
+	HTTPHeaders       []HTTPHeader
 }
 
 // HTTPServer instance
@@ -72,6 +73,7 @@ func New(options *Options) (*HTTPServer, error) {
 	}
 
 	httpHandler = h.loglayer(httpHandler)
+	httpHandler = h.headerlayer(httpHandler, options.HTTPHeaders)
 
 	// add handler
 	h.layers = httpHandler
