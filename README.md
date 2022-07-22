@@ -69,7 +69,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-realm`         | Basic auth message                                      | `simplehttpserver -realm "insert the credentials"` |
 | `-version`       | Show version                                            | `simplehttpserver -version`                        |
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
-| `-header`        | dd HTTP Response Header (can be used multiple times)    | `simplehttpserver -header 'X-Powered-By: Go'`      |
+| `-header`        | HTTP response header (can be used multiple times)       | `simplehttpserver -header 'X-Powered-By: Go'`      |
 
 ### Running simplehttpserver in the current folder  
 
