@@ -2,37 +2,40 @@ package runner
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
+	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 )
 
 // Options of the tool
 type Options struct {
-	ListenAddress  string
-	Folder         string
-	BasicAuth      string
-	username       string
-	password       string
-	Realm          string
-	TLSCertificate string
-	TLSKey         string
-	TLSDomain      string
-	HTTPS          bool
-	Verbose        bool
-	EnableUpload   bool
-	EnableTCP      bool
-	RulesFile      string
-	TCPWithTLS     bool
-	Version        bool
-	Silent         bool
-	Sandbox        bool
-	MaxFileSize    int
-	HTTP1Only      bool
+	ListenAddress   string
+	Folder          string
+	BasicAuth       string
+	username        string
+	password        string
+	Realm           string
+	TLSCertificate  string
+	TLSKey          string
+	TLSDomain       string
+	HTTPS           bool
+	Verbose         bool
+	EnableUpload    bool
+	EnableTCP       bool
+	RulesFile       string
+	TCPWithTLS      bool
+	Version         bool
+	Silent          bool
+	Sandbox         bool
+	MaxFileSize     int
+	HTTP1Only       bool
 	MaxDumpBodySize int
+	HTTPHeaders     HTTPHeaders
 }
 
 // ParseOptions parses the command line options for application
@@ -61,6 +64,7 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1")
 	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
 	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
+	flag.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times")
 	flag.Parse()
 
 	// Read the inputs and configure the logging
@@ -112,4 +116,22 @@ func (options *Options) FolderAbsPath() string {
 		return options.Folder
 	}
 	return abspath
+}
+
+// HTTPHeaders is a slice of HTTPHeader structs
+type HTTPHeaders []httpserver.HTTPHeader
+
+func (h *HTTPHeaders) String() string {
+	return fmt.Sprint(*h)
+}
+
+// Set sets a new header, which must be a string of the form 'name: value'
+func (h *HTTPHeaders) Set(value string) error {
+	tokens := strings.SplitN(value, ":", 2)
+	if len(tokens) != 2 {
+		return fmt.Errorf("header '%s' not in format 'name: value'", value)
+	}
+
+	*h = append(*h, httpserver.HTTPHeader{Name: tokens[0], Value: tokens[1]})
+	return nil
 }
