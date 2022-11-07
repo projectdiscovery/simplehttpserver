@@ -12,27 +12,28 @@ import (
 
 // Options of the tool
 type Options struct {
-	ListenAddress  string
-	Folder         string
-	BasicAuth      string
-	username       string
-	password       string
-	Realm          string
-	TLSCertificate string
-	TLSKey         string
-	TLSDomain      string
-	HTTPS          bool
-	Verbose        bool
-	EnableUpload   bool
-	EnableTCP      bool
-	RulesFile      string
-	TCPWithTLS     bool
-	Version        bool
-	Silent         bool
-	Sandbox        bool
-	MaxFileSize    int
-	HTTP1Only      bool
+	ListenAddress   string
+	Folder          string
+	BasicAuth       string
+	username        string
+	password        string
+	Realm           string
+	TLSCertificate  string
+	TLSKey          string
+	TLSDomain       string
+	HTTPS           bool
+	Verbose         bool
+	EnableUpload    bool
+	EnableTCP       bool
+	RulesFile       string
+	TCPWithTLS      bool
+	Version         bool
+	Silent          bool
+	Sandbox         bool
+	MaxFileSize     int
+	HTTP1Only       bool
 	MaxDumpBodySize int
+	CORS            bool
 }
 
 // ParseOptions parses the command line options for application
@@ -61,6 +62,7 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1")
 	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
 	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
+	flag.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)")
 	flag.Parse()
 
 	// Read the inputs and configure the logging

@@ -27,6 +27,7 @@ type Options struct {
 	HTTP1Only         bool
 	MaxFileSize       int // 50Mb
 	MaxDumpBodySize   int64
+	CORS              bool
 }
 
 // HTTPServer instance
@@ -69,6 +70,10 @@ func New(options *Options) (*HTTPServer, error) {
 
 	if options.BasicAuthUsername != "" || options.BasicAuthPassword != "" {
 		addHandler(h.basicauthlayer)
+	}
+
+	if options.CORS {
+		addHandler(h.corslayer)
 	}
 
 	httpHandler = h.loglayer(httpHandler)

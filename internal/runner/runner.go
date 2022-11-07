@@ -68,6 +68,7 @@ func New(options *Options) (*Runner, error) {
 		MaxFileSize:       r.options.MaxFileSize,
 		HTTP1Only:         r.options.HTTP1Only,
 		MaxDumpBodySize:   unit.ToMb(r.options.MaxDumpBodySize),
+		CORS:              r.options.CORS,
 	})
 	if err != nil {
 		return nil, err
