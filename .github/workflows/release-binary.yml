@@ -18,7 +18,7 @@ jobs:
         with: 
           fetch-depth: 0
       - name: "Create release on GitHub"
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         env: 
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with: 
