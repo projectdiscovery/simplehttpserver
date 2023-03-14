@@ -1,3 +1,5 @@
+> This fork returns HTML that has same style as python's`
+
 <h1 align="center">SimpleHTTPserver</h1>
 <h4 align="center">Go alternative of python SimpleHTTPServer</h4>
 
