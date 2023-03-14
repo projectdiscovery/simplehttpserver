@@ -34,6 +34,16 @@ func (h pythonStyleHandler) Header() http.Header {
 	return h.origWriter.Header()
 }
 
+func (h pythonStyleHandler) writeListItem(b []byte, written *int) {
+	var i int
+	i, _ = fmt.Fprint(h.origWriter, "<li>")
+	*written += i
+	i, _ = h.origWriter.Write(bytes.Trim(b, "\r\n"))
+	*written += i
+	i, _ = fmt.Fprint(h.origWriter, "</li>\n")
+	*written += i
+}
+
 func (h pythonStyleHandler) Write(b []byte) (int, error) {
 	var i int
 	written := 0
@@ -52,12 +62,7 @@ func (h pythonStyleHandler) Write(b []byte) (int, error) {
 	}
 
 	if bytes.HasPrefix(b, []byte(aTag)) {
-		i, _ = fmt.Fprint(h.origWriter, "<li>")
-		written += i
-		i, _ = h.origWriter.Write(bytes.Trim(b, "\r\n"))
-		written += i
-		i, _ = fmt.Fprint(h.origWriter, "</li>\n")
-		written += i
+		h.writeListItem(b, &written)
 	}
 	return i, nil
 }
