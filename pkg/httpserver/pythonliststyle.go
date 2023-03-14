@@ -67,11 +67,13 @@ func (h pythonStyleHandler) WriteHeader(statusCode int) {
 }
 
 func (h pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	_, _ = fmt.Fprint(writer, htmlHeader)
+	_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
+
 	h.origWriter = writer
-	_, _ = fmt.Fprint(h.origWriter, htmlHeader)
-	_, _ = fmt.Fprintf(h.origWriter, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
 	h.goFileServer.ServeHTTP(h, request)
-	_, _ = fmt.Fprint(h.origWriter, htmlFooter)
+
+	_, _ = fmt.Fprint(writer, htmlFooter)
 }
 
 func PythonStyle(handler http.Handler) http.Handler {
