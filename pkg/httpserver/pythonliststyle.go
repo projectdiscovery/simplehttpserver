@@ -15,7 +15,7 @@ const (
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Directory listing for /</title>
+<title>Directory listing for %s</title>
 </head>
 <body>
 `
@@ -72,7 +72,7 @@ func (h pythonStyleHandler) WriteHeader(statusCode int) {
 }
 
 func (h pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	_, _ = fmt.Fprint(writer, htmlHeader)
+	_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
 	_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
 
 	h.origWriter = writer
