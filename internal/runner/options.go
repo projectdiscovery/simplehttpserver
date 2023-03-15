@@ -35,6 +35,7 @@ type Options struct {
 	MaxFileSize     int
 	HTTP1Only       bool
 	MaxDumpBodySize int
+	CORS            bool
 	HTTPHeaders     HTTPHeaders
 }
 
@@ -64,6 +65,7 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1")
 	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
 	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
+	flag.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)")
 	flag.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times")
 	flag.Parse()
 
