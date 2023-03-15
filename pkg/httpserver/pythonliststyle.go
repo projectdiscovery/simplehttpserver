@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path"
 )
 
 const (
@@ -26,15 +28,15 @@ const (
 )
 
 type pythonStyleHandler struct {
-	origWriter   http.ResponseWriter
-	goFileServer http.Handler
+	origWriter http.ResponseWriter
+	root       http.Dir
 }
 
-func (h pythonStyleHandler) Header() http.Header {
+func (h *pythonStyleHandler) Header() http.Header {
 	return h.origWriter.Header()
 }
 
-func (h pythonStyleHandler) writeListItem(b []byte, written *int) {
+func (h *pythonStyleHandler) writeListItem(b []byte, written *int) {
 	var i int
 	i, _ = fmt.Fprint(h.origWriter, "<li>")
 	*written += i
@@ -44,7 +46,7 @@ func (h pythonStyleHandler) writeListItem(b []byte, written *int) {
 	*written += i
 }
 
-func (h pythonStyleHandler) Write(b []byte) (int, error) {
+func (h *pythonStyleHandler) Write(b []byte) (int, error) {
 	var i int
 	written := 0
 
@@ -67,22 +69,28 @@ func (h pythonStyleHandler) Write(b []byte) (int, error) {
 	return i, nil
 }
 
-func (h pythonStyleHandler) WriteHeader(statusCode int) {
+func (h *pythonStyleHandler) WriteHeader(statusCode int) {
 	h.origWriter.WriteHeader(statusCode)
 }
 
-func (h pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
-	_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
+func (h *pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	target := path.Join(string(h.root), path.Clean(request.URL.Path))
+	file, _ := os.Stat(target)
 
-	h.origWriter = writer
-	h.goFileServer.ServeHTTP(h, request)
-
-	_, _ = fmt.Fprint(writer, htmlFooter)
+	if !file.IsDir() {
+		http.ServeFile(writer, request, target)
+		return
+	} else {
+		_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
+		_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
+		h.origWriter = writer
+		http.ServeFile(h, request, target)
+		_, _ = fmt.Fprint(writer, htmlFooter)
+	}
 }
 
-func PythonStyle(handler http.Handler) http.Handler {
-	return pythonStyleHandler{
-		goFileServer: handler,
+func PythonStyle(root http.Dir) http.Handler {
+	return &pythonStyleHandler{
+		root: root,
 	}
 }
