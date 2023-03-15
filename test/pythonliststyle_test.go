@@ -51,7 +51,7 @@ func TestServeFileContentForFiles(t *testing.T) {
 		nil,
 	))
 	got, _ := io.ReadAll(w.Result().Body)
-	if bytes.Compare(want, got) != 0 {
+	if !bytes.Equal(want, got) {
 		t.Errorf("want:\n%x\ngot:\n%x", want, got)
 	}
 }
