@@ -1,15 +1,17 @@
 package test
 
 import (
+	"bytes"
 	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 	"io"
-	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 )
 
-const want = `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+func TestServePythonStyleHtmlPageForDirectories(t *testing.T) {
+	const want = `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -25,9 +27,7 @@ const want = `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.o
 </body>
 </html>
 `
-
-func TestWritePythonStyleHtmlPage(t *testing.T) {
-	py := httpserver.PythonStyle(http.FileServer(http.Dir("./fixture/pythonliststyle")))
+	py := httpserver.PythonStyle("./fixture/pythonliststyle")
 
 	w := httptest.NewRecorder()
 	py.ServeHTTP(w, httptest.NewRequest("GET", "http://example.com/", nil))
@@ -36,5 +36,22 @@ func TestWritePythonStyleHtmlPage(t *testing.T) {
 	body := string(b)
 	if strings.Compare(want, body) != 0 {
 		t.Errorf("want:\n%s\ngot:\n%s", want, body)
+	}
+}
+
+func TestServeFileContentForFiles(t *testing.T) {
+	want, _ := os.ReadFile("./fixture/pythonliststyle/test file.txt")
+
+	py := httpserver.PythonStyle("./fixture/pythonliststyle")
+
+	w := httptest.NewRecorder()
+	py.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"http://example.com/test%20file.txt",
+		nil,
+	))
+	got, _ := io.ReadAll(w.Result().Body)
+	if bytes.Compare(want, got) != 0 {
+		t.Errorf("want:\n%x\ngot:\n%x", want, got)
 	}
 }

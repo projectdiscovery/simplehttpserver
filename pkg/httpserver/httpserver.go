@@ -57,7 +57,7 @@ func New(options *Options) (*HTTPServer, error) {
 		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
 	}
 
-	httpHandler := PythonStyle(http.FileServer(dir))
+	httpHandler := PythonStyle(dir.(http.Dir))
 	addHandler := func(newHandler Middleware) {
 		httpHandler = newHandler(httpHandler)
 	}
