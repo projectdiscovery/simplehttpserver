@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 const (
@@ -74,7 +74,7 @@ func (h *pythonStyleHandler) WriteHeader(statusCode int) {
 }
 
 func (h *pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	target := path.Join(string(h.root), path.Clean(request.URL.Path))
+	target := filepath.Join(string(h.root), filepath.Clean(request.URL.Path))
 	file, err := os.Stat(target)
 
 	if err != nil || !file.IsDir() {

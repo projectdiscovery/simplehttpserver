@@ -27,6 +27,7 @@ type Options struct {
 	HTTP1Only         bool
 	MaxFileSize       int // 50Mb
 	MaxDumpBodySize   int64
+	Python            bool
 }
 
 // HTTPServer instance
@@ -57,7 +58,13 @@ func New(options *Options) (*HTTPServer, error) {
 		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
 	}
 
-	httpHandler := PythonStyle(dir.(http.Dir))
+	var httpHandler http.Handler
+	if options.Python {
+		httpHandler = PythonStyle(dir.(http.Dir))
+	} else {
+		httpHandler = http.FileServer(dir)
+	}
+
 	addHandler := func(newHandler Middleware) {
 		httpHandler = newHandler(httpHandler)
 	}

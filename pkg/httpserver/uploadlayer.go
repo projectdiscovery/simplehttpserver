@@ -91,7 +91,7 @@ func handleUpload(base, file string, data []byte) error {
 	}
 	trustedPath := untrustedPath
 
-	if _, err := os.Stat(path.Dir(trustedPath)); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Dir(trustedPath)); os.IsNotExist(err) {
 		return errors.New("invalid path")
 	}
 

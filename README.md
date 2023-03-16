@@ -1,5 +1,3 @@
-> This fork returns HTML that has same style as python's
-
 <h1 align="center">SimpleHTTPserver</h1>
 <h4 align="center">Go alternative of python SimpleHTTPServer</h4>
 
@@ -71,6 +69,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-realm`         | Basic auth message                                      | `simplehttpserver -realm "insert the credentials"` |
 | `-version`       | Show version                                            | `simplehttpserver -version`                        |
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
+| `-py`            | Emulate Python Style                                    | `simplehttpserver -py`                             |
 
 ### Running simplehttpserver in the current folder  
 
