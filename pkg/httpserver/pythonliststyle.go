@@ -75,9 +75,9 @@ func (h *pythonStyleHandler) WriteHeader(statusCode int) {
 
 func (h *pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	target := path.Join(string(h.root), path.Clean(request.URL.Path))
-	file, _ := os.Stat(target)
+	file, err := os.Stat(target)
 
-	if !file.IsDir() {
+	if err != nil || !file.IsDir() {
 		http.ServeFile(writer, request, target)
 		return
 	} else {

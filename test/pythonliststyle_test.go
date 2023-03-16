@@ -55,3 +55,21 @@ func TestServeFileContentForFiles(t *testing.T) {
 		t.Errorf("want:\n%x\ngot:\n%x", want, got)
 	}
 }
+
+func TestResponseNotFound(t *testing.T) {
+	const want = `404 page not found
+`
+
+	py := httpserver.PythonStyle("./fixture/pythonliststyle")
+
+	w := httptest.NewRecorder()
+	py.ServeHTTP(w, httptest.NewRequest(
+		"GET",
+		"http://example.com/does-not-exist.txt",
+		nil,
+	))
+	got, _ := io.ReadAll(w.Result().Body)
+	if strings.Compare(want, string(got)) != 0 {
+		t.Errorf("want:\n%s\ngot:\n%s", want, got)
+	}
+}
