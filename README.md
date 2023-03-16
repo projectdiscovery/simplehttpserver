@@ -70,6 +70,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-version`       | Show version                                            | `simplehttpserver -version`                        |
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
 | `-py`            | Emulate Python Style                                    | `simplehttpserver -py`                             |
+| `-header`        | HTTP response header (can be used multiple times)       | `simplehttpserver -header 'X-Powered-By: Go'`      |
 
 ### Running simplehttpserver in the current folder  
 

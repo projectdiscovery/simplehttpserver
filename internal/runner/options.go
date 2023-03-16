@@ -2,12 +2,14 @@ package runner
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
+	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
 )
 
 // Options of the tool
@@ -34,6 +36,8 @@ type Options struct {
 	HTTP1Only       bool
 	MaxDumpBodySize int
 	Python          bool
+	CORS            bool
+	HTTPHeaders     HTTPHeaders
 }
 
 // ParseOptions parses the command line options for application
@@ -63,6 +67,8 @@ func ParseOptions() *Options {
 	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
 	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
 	flag.BoolVar(&options.Python, "py", false, "Emulate Python Style")
+	flag.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)")
+	flag.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times")
 	flag.Parse()
 
 	// Read the inputs and configure the logging
@@ -114,4 +120,22 @@ func (options *Options) FolderAbsPath() string {
 		return options.Folder
 	}
 	return abspath
+}
+
+// HTTPHeaders is a slice of HTTPHeader structs
+type HTTPHeaders []httpserver.HTTPHeader
+
+func (h *HTTPHeaders) String() string {
+	return fmt.Sprint(*h)
+}
+
+// Set sets a new header, which must be a string of the form 'name: value'
+func (h *HTTPHeaders) Set(value string) error {
+	tokens := strings.SplitN(value, ":", 2)
+	if len(tokens) != 2 {
+		return fmt.Errorf("header '%s' not in format 'name: value'", value)
+	}
+
+	*h = append(*h, httpserver.HTTPHeader{Name: tokens[0], Value: tokens[1]})
+	return nil
 }
