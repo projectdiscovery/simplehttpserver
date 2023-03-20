@@ -2,7 +2,7 @@ package httpserver
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -55,7 +55,7 @@ func (t *HTTPServer) uploadlayer(handler http.Handler) http.Handler {
 				r.Body = http.MaxBytesReader(w, r.Body, maxFileSize)
 			}
 
-			data, err = ioutil.ReadAll(r.Body)
+			data, err = io.ReadAll(r.Body)
 			if err != nil {
 				gologger.Print().Msgf("%s\n", err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -95,5 +95,5 @@ func handleUpload(base, file string, data []byte) error {
 		return errors.New("invalid path")
 	}
 
-	return ioutil.WriteFile(trustedPath, data, 0655)
+	return os.WriteFile(trustedPath, data, 0655)
 }
