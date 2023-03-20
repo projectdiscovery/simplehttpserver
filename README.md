@@ -65,10 +65,13 @@ This will display help for the tool. Here are all the switches it supports.
 | `-cert`          | HTTPS/TLS certificate (self generated if not specified) | `simplehttpserver -cert cert.pem`                  |
 | `-key`           | HTTPS/TLS certificate private key                       | `simplehttpserver -key cert.key`                   |
 | `-domain`        | Domain name to use for the self-generated certificate   | `simplehttpserver -domain projectdiscovery.io`     |
+| `-cors`          | Enable cross-origin resource sharing (CORS)             | `simplehttpserver -cors`                           |
 | `-basic-auth`    | Basic auth (username:password)                          | `simplehttpserver -basic-auth user:password`       |
 | `-realm`         | Basic auth message                                      | `simplehttpserver -realm "insert the credentials"` |
 | `-version`       | Show version                                            | `simplehttpserver -version`                        |
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
+| `-py`            | Emulate Python Style                                    | `simplehttpserver -py`                             |
+| `-header`        | HTTP response header (can be used multiple times)       | `simplehttpserver -header 'X-Powered-By: Go'`      |
 
 ### Running simplehttpserver in the current folder  
 

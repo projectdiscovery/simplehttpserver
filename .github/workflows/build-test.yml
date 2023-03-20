@@ -1,7 +1,10 @@
 name: 🔨 Build Test
+
 on:
-  push:
   pull_request:
+    paths:
+      - '**.go'
+      - '**.mod'
   workflow_dispatch:
 
 
@@ -11,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Check out code
         uses: actions/checkout@v3
