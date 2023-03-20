@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"io/ioutil"
+	"os"
 	"net"
 	"sync"
 	"time"
@@ -146,7 +146,7 @@ func (t *TCPServer) Close() error {
 // LoadTemplate from yaml
 func (t *TCPServer) LoadTemplate(templatePath string) error {
 	var config RulesConfiguration
-	yamlFile, err := ioutil.ReadFile(templatePath)
+	yamlFile, err := os.ReadFile(templatePath)
 	if err != nil {
 		return err
 	}
