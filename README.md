@@ -126,7 +126,7 @@ curl -v --user 'root:root' --upload-file file.txt http://localhost:8000/file.txt
 This will run the tool as TLS TCP server and enable custom responses based on YAML templates:
 
 ```sh
-simplehttpserver -rule rules.yaml -tcp -tls -domain localhost
+simplehttpserver -rules rules.yaml -tcp -tls -domain localhost
 ```
 
 The rules are written as follows:
