@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/simplehttpserver/pkg/httpserver"
@@ -43,33 +44,48 @@ type Options struct {
 // ParseOptions parses the command line options for application
 func ParseOptions() *Options {
 	options := &Options{}
-	flag.StringVar(&options.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port")
-	flag.BoolVar(&options.EnableTCP, "tcp", false, "TCP Server")
-	flag.BoolVar(&options.TCPWithTLS, "tls", false, "Enable TCP TLS")
-	flag.StringVar(&options.RulesFile, "rules", "", "Rules yaml file")
+	flagSet := goflags.NewFlagSet()
+	flagSet.SetDescription(`SimpleHTTPserver is a go enhanced version of the well known python simplehttpserver with in addition a fully customizable TCP server, both supporting TLS`)
+
 	currentPath := "."
 	if p, err := os.Getwd(); err == nil {
 		currentPath = p
 	}
-	flag.StringVar(&options.Folder, "path", currentPath, "Folder")
-	flag.BoolVar(&options.EnableUpload, "upload", false, "Enable upload via PUT")
-	flag.BoolVar(&options.HTTPS, "https", false, "HTTPS")
-	flag.StringVar(&options.TLSCertificate, "cert", "", "HTTPS Certificate")
-	flag.StringVar(&options.TLSKey, "key", "", "HTTPS Certificate Key")
-	flag.StringVar(&options.TLSDomain, "domain", "local.host", "Domain")
-	flag.BoolVar(&options.Verbose, "verbose", false, "Verbose")
-	flag.StringVar(&options.BasicAuth, "basic-auth", "", "Basic auth (username:password)")
-	flag.StringVar(&options.Realm, "realm", "Please enter username and password", "Realm")
-	flag.BoolVar(&options.Version, "version", false, "Show version of the software")
-	flag.BoolVar(&options.Silent, "silent", false, "Show only results in the output")
-	flag.BoolVar(&options.Sandbox, "sandbox", false, "Enable sandbox mode")
-	flag.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1")
-	flag.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size")
-	flag.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size")
-	flag.BoolVar(&options.Python, "py", false, "Emulate Python Style")
-	flag.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)")
-	flag.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times")
-	flag.Parse()
+
+	flagSet.CreateGroup("input", "Input",
+		flagSet.StringVar(&options.ListenAddress, "listen", "0.0.0.0:8000", "Address:Port"),
+	)
+
+	flagSet.CreateGroup("config", "Config",
+		flagSet.BoolVar(&options.EnableTCP, "tcp", false, "TCP Server"),
+		flagSet.BoolVar(&options.TCPWithTLS, "tls", false, "Enable TCP TLS"),
+		flagSet.StringVar(&options.RulesFile, "rules", "", "Rules yaml file"),
+		flagSet.StringVar(&options.Folder, "path", currentPath, "Folder"),
+		flagSet.BoolVar(&options.EnableUpload, "upload", false, "Enable upload via PUT"),
+		flagSet.BoolVar(&options.HTTPS, "https", false, "HTTPS"),
+		flagSet.StringVar(&options.TLSCertificate, "cert", "", "HTTPS Certificate"),
+		flagSet.StringVar(&options.TLSKey, "key", "", "HTTPS Certificate Key"),
+		flagSet.StringVar(&options.TLSDomain, "domain", "local.host", "Domain"),
+		flagSet.StringVar(&options.BasicAuth, "basic-auth", "", "Basic auth (username:password),"),
+		flagSet.StringVar(&options.Realm, "realm", "Please enter username and password", "Realm"),
+		flagSet.BoolVar(&options.Silent, "silent", false, "Show only results in the output"),
+		flagSet.BoolVar(&options.Sandbox, "sandbox", false, "Enable sandbox mode"),
+		flagSet.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1"),
+		flagSet.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size"),
+		flagSet.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size"),
+		flagSet.BoolVar(&options.Python, "py", false, "Emulate Python Style"),
+		flagSet.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)"),
+		flagSet.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times"),
+	)
+
+	flagSet.CreateGroup("debug", "Debug",
+		flagSet.BoolVar(&options.Version, "version", false, "Show version of the software"),
+		flagSet.BoolVar(&options.Verbose, "verbose", false, "Verbose"),
+	)
+
+	if err := flagSet.Parse(); err != nil {
+		gologger.Fatal().Msgf("%v: parse error", err.Error())
+	}
 
 	// Read the inputs and configure the logging
 	options.configureOutput()
