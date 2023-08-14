@@ -1,4 +1,4 @@
-FROM golang:1.20.7-alpine as build-env
+FROM golang:1.21.0-alpine as build-env
 RUN go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@latest
 
 FROM alpine:latest
