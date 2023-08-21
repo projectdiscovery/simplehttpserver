@@ -54,8 +54,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/projectdiscovery/blackrock v0.0.1 h1:lHQqhaaEFjgf5WkuItbpeCZv2DUIE45k0VbGJyft6LQ=
 github.com/projectdiscovery/blackrock v0.0.1/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
-github.com/projectdiscovery/goflags v0.1.16 h1:ua0tEjl3w5sUf3qsyUHYuxVZeHFZ2HWzkEq6t7luGY0=
-github.com/projectdiscovery/goflags v0.1.16/go.mod h1:n0TWe/lpb7AZCNagDRX9VPKB1gY+/o+EfD2zd8lJJJk=
+github.com/projectdiscovery/goflags v0.1.17 h1:Fr+28b7y5K3/aiSfN97X7jTtk0XcGgMKaT8I2X+7ZYI=
+github.com/projectdiscovery/goflags v0.1.17/go.mod h1:n0TWe/lpb7AZCNagDRX9VPKB1gY+/o+EfD2zd8lJJJk=
 github.com/projectdiscovery/gologger v1.1.11 h1:8vsz9oJlDT9euw6xlj7F7dZ6RWItVIqVwn4Mr6uzky8=
 github.com/projectdiscovery/gologger v1.1.11/go.mod h1:UR2bgXl7zraOxYGnUwuO917hifWrwMJ0feKnVqMQkzY=
 github.com/projectdiscovery/sslcert v0.0.0-20210416140253-8f56bec1bb5e h1:IZa08TUGbU7I0HUb9QQt/8wuu2fPZqfnMXwWhtMxei8=
