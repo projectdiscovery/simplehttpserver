@@ -12,6 +12,7 @@ import (
 var (
 	EnableUpload  bool
 	EnableVerbose bool
+	EnableLogUA   bool
 )
 
 func (t *HTTPServer) shouldDumpBody(bodysize int64) bool {
@@ -34,7 +35,11 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 			lrw.Header().Write(headers) //nolint
 			gologger.Print().Msgf("\n[%s]\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
-			gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
+			if EnableLogUA {
+				gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d - %s", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size, r.UserAgent())
+			} else {
+				gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
+			}
 		}
 	})
 }

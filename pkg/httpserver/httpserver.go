@@ -14,6 +14,7 @@ import (
 type Options struct {
 	Folder            string
 	EnableUpload      bool
+	LogUA             bool // enable logging user agent
 	ListenAddress     string
 	TLS               bool
 	Certificate       string
@@ -46,6 +47,7 @@ func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
 	EnableUpload = options.EnableUpload
 	EnableVerbose = options.Verbose
+	EnableLogUA = options.LogUA
 	folder, err := filepath.Abs(options.Folder)
 	if err != nil {
 		return nil, err
