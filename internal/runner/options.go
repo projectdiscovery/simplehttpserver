@@ -27,6 +27,7 @@ type Options struct {
 	Verbose         bool
 	EnableUpload    bool
 	EnableTCP       bool
+	LogUA           bool
 	RulesFile       string
 	TCPWithTLS      bool
 	Version         bool
@@ -53,6 +54,7 @@ func ParseOptions() *Options {
 	}
 	flag.StringVar(&options.Folder, "path", currentPath, "Folder")
 	flag.BoolVar(&options.EnableUpload, "upload", false, "Enable upload via PUT")
+	flag.BoolVar(&options.LogUA, "log-ua", false, "Log User Agent")
 	flag.BoolVar(&options.HTTPS, "https", false, "HTTPS")
 	flag.StringVar(&options.TLSCertificate, "cert", "", "HTTPS Certificate")
 	flag.StringVar(&options.TLSKey, "key", "", "HTTPS Certificate Key")
