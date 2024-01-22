@@ -30,6 +30,8 @@ type Options struct {
 	Python            bool
 	CORS              bool
 	HTTPHeaders       []HTTPHeader
+
+	LogRequestsPerSecond bool
 }
 
 // HTTPServer instance
@@ -44,6 +46,8 @@ type Middleware func(http.Handler) http.Handler
 // New http server instance with options
 func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
+	h.options = options
+
 	EnableUpload = options.EnableUpload
 	EnableVerbose = options.Verbose
 	folder, err := filepath.Abs(options.Folder)
@@ -89,7 +93,6 @@ func New(options *Options) (*HTTPServer, error) {
 
 	// add handler
 	h.layers = httpHandler
-	h.options = options
 
 	return &h, nil
 }

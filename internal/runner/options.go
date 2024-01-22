@@ -38,6 +38,7 @@ type Options struct {
 	Python          bool
 	CORS            bool
 	HTTPHeaders     HTTPHeaders
+	LogRPS          bool
 }
 
 // ParseOptions parses the command line options for application
@@ -69,6 +70,7 @@ func ParseOptions() *Options {
 	flag.BoolVar(&options.Python, "py", false, "Emulate Python Style")
 	flag.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)")
 	flag.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times")
+	flag.BoolVar(&options.LogRPS, "log-rps", false, "Log requests per second")
 	flag.Parse()
 
 	// Read the inputs and configure the logging

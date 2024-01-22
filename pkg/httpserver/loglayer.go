@@ -2,9 +2,12 @@ package httpserver
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"sync/atomic"
 	"time"
+
 	"github.com/projectdiscovery/gologger"
 )
 
@@ -12,14 +15,30 @@ import (
 var (
 	EnableUpload  bool
 	EnableVerbose bool
+
+	requestsCounter atomic.Uint64
 )
 
 func (t *HTTPServer) shouldDumpBody(bodysize int64) bool {
 	return t.options.MaxDumpBodySize > 0 && bodysize > t.options.MaxDumpBodySize
 }
 
+func calculateRPS() {
+	var lastCount uint64
+	for range time.Tick(time.Second) {
+		currentCount := requestsCounter.Load()
+		fmt.Printf("Requests per second: %d\n", currentCount-lastCount)
+		lastCount = currentCount
+	}
+}
+
 func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
+	if t.options.LogRequestsPerSecond {
+		go calculateRPS()
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = requestsCounter.Add(1)
+
 		var fullRequest []byte
 		if t.shouldDumpBody(r.ContentLength) {
 			fullRequest, _ = httputil.DumpRequest(r, false)
@@ -33,7 +52,7 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 			headers := new(bytes.Buffer)
 			lrw.Header().Write(headers) //nolint
 			gologger.Print().Msgf("\n[%s]\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
-		} else {
+		} else if !t.options.LogRequestsPerSecond {
 			gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
 		}
 	})
