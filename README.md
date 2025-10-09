@@ -29,6 +29,7 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 - HTTP/S Web Server
 - File Server with arbitrary directory support
 - HTTP request/response dump
+- JSON request logging to file
 - Configurable ip address and listening port
 - Configurable HTTP/TCP server with customizable response via YAML template
 
@@ -72,6 +73,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
 | `-py`            | Emulate Python Style                                    | `simplehttpserver -py`                             |
 | `-header`        | HTTP response header (can be used multiple times)       | `simplehttpserver -header 'X-Powered-By: Go'`      |
+| `-json-log`      | JSON log file path for request logging                  | `simplehttpserver -json-log /tmp/requests.json`    |
 
 ### Running simplehttpserver in the current folder  
 
@@ -119,6 +121,39 @@ simplehttpserver -basic-auth root:root -upload
 To upload files use the following curl request with basic auth header:
 ```sh
 curl -v --user 'root:root' --upload-file file.txt http://localhost:8000/file.txt
+```
+
+### Running simplehttpserver with JSON request logging
+
+This will run the tool and log all HTTP requests to a JSON file:
+
+```sh
+simplehttpserver -json-log /tmp/requests.json
+
+2021/01/11 21:40:48 Serving . on http://0.0.0.0:8000/...
+```
+
+The JSON log file will contain structured request data including:
+- Timestamp, remote address, HTTP method, URL, protocol
+- Status code, response size, user agent
+- Request headers, request body, response body
+
+Example JSON log entry:
+```json
+{
+  "timestamp": "2021-01-11T21:41:15Z",
+  "remote_addr": "127.0.0.1:50181",
+  "method": "GET",
+  "url": "/",
+  "proto": "HTTP/1.1",
+  "status_code": 200,
+  "size": 383,
+  "user_agent": "curl/7.68.0",
+  "headers": {
+    "Accept": "*/*",
+    "User-Agent": "curl/7.68.0"
+  }
+}
 ```
 
 ### Running TCP server with custom responses
