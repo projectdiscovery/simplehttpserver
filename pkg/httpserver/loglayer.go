@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"time"
+
 	"github.com/projectdiscovery/gologger"
 )
 
@@ -12,6 +13,7 @@ import (
 var (
 	EnableUpload  bool
 	EnableVerbose bool
+	EnableLogUA   bool
 )
 
 func (t *HTTPServer) shouldDumpBody(bodysize int64) bool {
@@ -29,12 +31,41 @@ func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 		lrw := newLoggingResponseWriter(w, t.options.MaxDumpBodySize)
 		handler.ServeHTTP(lrw, r)
 
+		// Log to JSON file if JSON logger is enabled
+		if t.jsonLogger != nil {
+			// Extract headers
+			headers := make(map[string]string)
+			for name, values := range r.Header {
+				if len(values) > 0 {
+					headers[name] = values[0]
+				}
+			}
+
+			// Extract request body from fullRequest
+			requestBody := ""
+			if len(fullRequest) > 0 {
+				// Find the double CRLF that separates headers from body
+				bodyStart := bytes.Index(fullRequest, []byte("\r\n\r\n"))
+				if bodyStart != -1 && bodyStart+4 < len(fullRequest) {
+					requestBody = string(fullRequest[bodyStart+4:])
+				}
+			}
+
+			// Log to JSON file
+			_ = t.jsonLogger.LogRequest(r, lrw.statusCode, lrw.Size, r.UserAgent(), headers, requestBody, string(lrw.Data))
+		}
+
+		// Continue with existing console logging
 		if EnableVerbose {
 			headers := new(bytes.Buffer)
 			lrw.Header().Write(headers) //nolint
 			gologger.Print().Msgf("\n[%s]\nRemote Address: %s\n%s\n%s %d %s\n%s\n%s\n", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, string(fullRequest), r.Proto, lrw.statusCode, http.StatusText(lrw.statusCode), headers.String(), string(lrw.Data))
 		} else {
-			gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
+			if EnableLogUA {
+				gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d - %s", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size, r.UserAgent())
+			} else {
+				gologger.Print().Msgf("[%s] %s \"%s %s %s\" %d %d", time.Now().Format("2006-01-02 15:04:05"), r.RemoteAddr, r.Method, r.URL, r.Proto, lrw.statusCode, lrw.Size)
+			}
 		}
 	})
 }

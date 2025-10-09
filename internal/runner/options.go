@@ -28,6 +28,7 @@ type Options struct {
 	Verbose         bool
 	EnableUpload    bool
 	EnableTCP       bool
+	LogUA           bool
 	RulesFile       string
 	TCPWithTLS      bool
 	Version         bool
@@ -39,6 +40,7 @@ type Options struct {
 	Python          bool
 	CORS            bool
 	HTTPHeaders     HTTPHeaders
+	JSONLogFile     string
 }
 
 // ParseOptions parses the command line options for application
@@ -76,11 +78,13 @@ func ParseOptions() *Options {
 		flagSet.BoolVar(&options.Python, "py", false, "Emulate Python Style"),
 		flagSet.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)"),
 		flagSet.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times"),
+		flagSet.StringVar(&options.JSONLogFile, "json-log", "", "JSON log file path for request logging"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
 		flagSet.BoolVar(&options.Version, "version", false, "Show version of the software"),
 		flagSet.BoolVar(&options.Verbose, "verbose", false, "Verbose"),
+		flagSet.BoolVar(&options.LogUA, "log-ua", false, "Log User Agent"),
 	)
 
 	if err := flagSet.Parse(); err != nil {

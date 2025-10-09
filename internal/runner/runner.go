@@ -59,6 +59,7 @@ func New(options *Options) (*Runner, error) {
 	httpServer, err := httpserver.New(&httpserver.Options{
 		Folder:            r.options.Folder,
 		EnableUpload:      r.options.EnableUpload,
+		LogUA:             r.options.LogUA,
 		ListenAddress:     r.options.ListenAddress,
 		TLS:               r.options.HTTPS,
 		Certificate:       r.options.TLSCertificate,
@@ -75,6 +76,7 @@ func New(options *Options) (*Runner, error) {
 		Python:            r.options.Python,
 		CORS:              r.options.CORS,
 		HTTPHeaders:       r.options.HTTPHeaders,
+		JSONLogFile:       r.options.JSONLogFile,
 	})
 	if err != nil {
 		return nil, err

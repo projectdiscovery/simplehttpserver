@@ -14,6 +14,7 @@ import (
 type Options struct {
 	Folder            string
 	EnableUpload      bool
+	LogUA             bool // enable logging user agent
 	ListenAddress     string
 	TLS               bool
 	Certificate       string
@@ -30,12 +31,14 @@ type Options struct {
 	Python            bool
 	CORS              bool
 	HTTPHeaders       []HTTPHeader
+	JSONLogFile       string
 }
 
 // HTTPServer instance
 type HTTPServer struct {
-	options *Options
-	layers  http.Handler
+	options    *Options
+	layers     http.Handler
+	jsonLogger *JSONLogger
 }
 
 // LayerHandler is the interface of all layer funcs
@@ -46,6 +49,16 @@ func New(options *Options) (*HTTPServer, error) {
 	var h HTTPServer
 	EnableUpload = options.EnableUpload
 	EnableVerbose = options.Verbose
+	EnableLogUA = options.LogUA
+
+	// Initialize JSON logger if specified
+	if options.JSONLogFile != "" {
+		jsonLogger, err := NewJSONLogger(options.JSONLogFile)
+		if err != nil {
+			return nil, err
+		}
+		h.jsonLogger = jsonLogger
+	}
 	folder, err := filepath.Abs(options.Folder)
 	if err != nil {
 		return nil, err
@@ -127,5 +140,8 @@ func (t *HTTPServer) ListenAndServeTLS() error {
 
 // Close the service
 func (t *HTTPServer) Close() error {
+	if t.jsonLogger != nil {
+		return t.jsonLogger.Close()
+	}
 	return nil
 }
