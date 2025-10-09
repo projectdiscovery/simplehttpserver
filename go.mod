@@ -1,6 +1,6 @@
 module github.com/projectdiscovery/simplehttpserver
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0
