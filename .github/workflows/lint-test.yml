@@ -12,15 +12,6 @@ jobs:
     name: Lint Test
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.19
-      - name: Checkout code
-        uses: actions/checkout@v5
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.7.0
-        with:
-          version: latest
-          args: --timeout 5m
-          working-directory: .
+      - uses: actions/checkout@v5
+      - uses: projectdiscovery/actions/setup/go@v1
+      - uses: projectdiscovery/actions/golangci-lint/v2@v1
