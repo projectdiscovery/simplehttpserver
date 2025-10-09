@@ -76,6 +76,7 @@ func New(options *Options) (*Runner, error) {
 		Python:            r.options.Python,
 		CORS:              r.options.CORS,
 		HTTPHeaders:       r.options.HTTPHeaders,
+		JSONLogFile:       r.options.JSONLogFile,
 	})
 	if err != nil {
 		return nil, err
