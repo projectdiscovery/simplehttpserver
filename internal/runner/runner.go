@@ -46,7 +46,11 @@ func New(options *Options) (*Runner, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer watcher.Close()
+		defer func() {
+			if watcher != nil {
+				_ = watcher.Close()
+			}
+		}()
 
 		r.serverTCP = serverTCP
 		return &r, nil
