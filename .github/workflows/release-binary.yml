@@ -10,7 +10,7 @@ jobs:
   release: 
     runs-on: ubuntu-latest
     steps: 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: projectdiscovery/actions/setup/go@v1
       - name: "Create release on GitHub"
         uses: goreleaser/goreleaser-action@v4
