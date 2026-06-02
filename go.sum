@@ -141,12 +141,12 @@ github.com/projectdiscovery/blackrock v0.0.1 h1:lHQqhaaEFjgf5WkuItbpeCZv2DUIE45k
 github.com/projectdiscovery/blackrock v0.0.1/go.mod h1:ANUtjDfaVrqB453bzToU+YB4cUbvBRpLvEwoWIwlTss=
 github.com/projectdiscovery/goflags v0.1.74 h1:n85uTRj5qMosm0PFBfsvOL24I7TdWRcWq/1GynhXS7c=
 github.com/projectdiscovery/goflags v0.1.74/go.mod h1:UMc9/7dFz2oln+10tv6cy+7WZKTHf9UGhaNkF95emh4=
-github.com/projectdiscovery/gologger v1.1.68 h1:KfdIO/3X7BtHssWZuqhxPZ+A946epCCx2cz+3NnRAnU=
-github.com/projectdiscovery/gologger v1.1.68/go.mod h1:Xae0t4SeqJVa0RQGK9iECx/+HfXhvq70nqOQp2BuW+o=
+github.com/projectdiscovery/gologger v1.1.70 h1:A1ZAsUJfRUXO6qqwTwyTWXLVlBrVu/Gpi1zzL1hg5LY=
+github.com/projectdiscovery/gologger v1.1.70/go.mod h1:kpLKNafZWRN9P7WpJYtIOY/XvY/v41GDdU9NzICdKmo=
 github.com/projectdiscovery/sslcert v0.0.0-20210416140253-8f56bec1bb5e h1:IZa08TUGbU7I0HUb9QQt/8wuu2fPZqfnMXwWhtMxei8=
 github.com/projectdiscovery/sslcert v0.0.0-20210416140253-8f56bec1bb5e/go.mod h1:jSp8W5zIkNPxAqVdcoFlfv0K5cqogTe65fMinR0Fvuk=
-github.com/projectdiscovery/utils v0.9.0 h1:eu9vdbP0VYXI9nGSLfnOpUqBeW9/B/iSli7U8gPKZw8=
-github.com/projectdiscovery/utils v0.9.0/go.mod h1:zcVu1QTlMi5763qCol/L3ROnbd/UPSBP8fI5PmcnF6s=
+github.com/projectdiscovery/utils v0.11.0 h1:CxImZSRyj9spy1wpB9HKJopr5MsIPm2r5iS8uyhAMoQ=
+github.com/projectdiscovery/utils v0.11.0/go.mod h1:q2mZngH1s4WDO3knYxG7iyP1KcxoRSORJCWSpCKFc1s=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd/go.mod h1:hPqNNc0+uJM6H+SuU8sEs5K5IQeKccPqeSjfgcKGgPk=
@@ -275,8 +275,8 @@ golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.39.0 h1:CvCKL8MeisomCi6qNZ+wbb0DN9E5AATixKsvNtMoMFk=
-golang.org/x/sys v0.39.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
+golang.org/x/sys v0.41.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
