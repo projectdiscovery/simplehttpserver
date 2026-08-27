@@ -97,21 +97,11 @@ func New(options *Options) (*HTTPServer, error) {
 		addHandler(h.corslayer)
 	}
 
-	// Wrap with router to handle /endless endpoint before applying middleware
-	var router http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/endless" {
-			h.endlessHandler(w, r)
-			return
-		}
-		httpHandler.ServeHTTP(w, r)
-	})
-
-	// Apply middleware to router
-	router = h.loglayer(router)
-	router = h.headerlayer(router, options.HTTPHeaders)
+	httpHandler = h.loglayer(httpHandler)
+	httpHandler = h.headerlayer(httpHandler, options.HTTPHeaders)
 
 	// add handler
-	h.layers = router
+	h.layers = httpHandler
 	h.options = options
 
 	return &h, nil
@@ -146,59 +136,6 @@ func (t *HTTPServer) ListenAndServeTLS() error {
 		return httpServer.ListenAndServeTLS("", "")
 	}
 	return http.ListenAndServeTLS(t.options.ListenAddress, t.options.Certificate, t.options.CertificateKey, t.layers)
-}
-
-// endlessHandler streams endless data to the client
-func (t *HTTPServer) endlessHandler(w http.ResponseWriter, r *http.Request) {
-	// Set headers for streaming
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Transfer-Encoding", "chunked")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.WriteHeader(http.StatusOK)
-
-	// Flush headers immediately
-	flusher, hasFlusher := w.(http.Flusher)
-	if hasFlusher {
-		flusher.Flush()
-	}
-
-	// 100MB in bytes
-	const dataSize = 100 * 1024 * 1024
-
-	// Generate 100MB data chunk once
-	dataChunk := make([]byte, dataSize)
-	pattern := []byte("Data chunk - streaming endless data...\n")
-	offset := 0
-	for offset < dataSize {
-		copySize := len(pattern)
-		if offset+copySize > dataSize {
-			copySize = dataSize - offset
-		}
-		copy(dataChunk[offset:], pattern[:copySize])
-		offset += copySize
-	}
-
-	// Stream data continuously - write and flush the 100MB chunk repeatedly
-	for {
-		// Check if client disconnected
-		select {
-		case <-r.Context().Done():
-			return
-		default:
-		}
-
-		// Write the 100MB chunk
-		_, err := w.Write(dataChunk)
-		if err != nil {
-			return
-		}
-
-		// Flush after each write
-		if hasFlusher {
-			flusher.Flush()
-		}
-	}
 }
 
 // Close the service
