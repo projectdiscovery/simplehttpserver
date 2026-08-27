@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
-	github.com/projectdiscovery/goflags v0.1.75
+	github.com/projectdiscovery/goflags v0.1.76
 	github.com/projectdiscovery/gologger v1.1.68
 	github.com/projectdiscovery/sslcert v0.0.0-20210416140253-8f56bec1bb5e
 	gopkg.in/yaml.v2 v2.4.0
