@@ -36,7 +36,7 @@ SimpleHTTPserver is a go enhanced version of the well known python simplehttpser
 
 # Installing SimpleHTTPserver
 
-SimpleHTTPserver requires **go1.17+** to install successfully. Run the following command to get the repo - 
+SimpleHTTPserver requires **go1.26.10+** to install successfully. Run the following command to get the repo - 
 
 ```sh
 go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@latest
