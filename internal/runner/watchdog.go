@@ -25,8 +25,8 @@ func watchFile(fname string, callback WatchEvent) (watcher *fsnotify.Watcher, er
 						log.Println("err", err)
 					}
 				}
-			case <-watcher.Errors:
-				// ignore errors for now
+			case err := <-watcher.Errors:
+				log.Println("err", err)
 			}
 		}
 	}()
