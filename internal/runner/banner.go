@@ -1,6 +1,9 @@
 package runner
 
-import "github.com/projectdiscovery/gologger"
+import (
+	"github.com/projectdiscovery/gologger"
+	updateutils "github.com/projectdiscovery/utils/update"
+)
 
 const banner = `
    _____ _                 __     __  __________________                                
@@ -18,4 +21,12 @@ const Version = `0.0.6`
 func showBanner() {
 	gologger.Print().Msgf("%s\n", banner)
 	gologger.Print().Msgf("\t\tprojectdiscovery.io\n\n")
+}
+
+// GetUpdateCallback returns a callback function that updates simplehttpserver.
+func GetUpdateCallback() func() {
+	return func() {
+		showBanner()
+		updateutils.GetUpdateToolCallback("simplehttpserver", Version)()
+	}
 }

@@ -87,6 +87,10 @@ func ParseOptions() *Options {
 		flagSet.BoolVar(&options.LogUA, "log-ua", false, "Log User Agent"),
 	)
 
+	flagSet.CreateGroup("update", "Update",
+		flagSet.CallbackVarP(GetUpdateCallback(), "update", "up", "update simplehttpserver to latest version"),
+	)
+
 	if err := flagSet.Parse(); err != nil {
 		gologger.Fatal().Msgf("%v: parse error", err.Error())
 	}

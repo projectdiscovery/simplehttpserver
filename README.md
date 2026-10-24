@@ -42,6 +42,14 @@ SimpleHTTPserver requires **go1.26.10+** to install successfully. Run the follow
 go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@latest
 ```
 
+To update an installed binary to the latest release, run:
+
+```sh
+simplehttpserver -update
+```
+
+The `-up` alias is also supported. The update command exits when finished without starting a server.
+
 # Usage
 
 ```sh
@@ -70,6 +78,7 @@ This will display help for the tool. Here are all the switches it supports.
 | `-basic-auth`    | Basic auth (username:password)                          | `simplehttpserver -basic-auth user:password`       |
 | `-realm`         | Basic auth message                                      | `simplehttpserver -realm "insert the credentials"` |
 | `-version`       | Show version                                            | `simplehttpserver -version`                        |
+| `-up`, `-update` | Update to the latest release                             | `simplehttpserver -update`                         |
 | `-silent`        | Show only results                                       | `simplehttpserver -silent`                         |
 | `-py`            | Emulate Python Style                                    | `simplehttpserver -py`                             |
 | `-header`        | HTTP response header (can be used multiple times)       | `simplehttpserver -header 'X-Powered-By: Go'`      |
