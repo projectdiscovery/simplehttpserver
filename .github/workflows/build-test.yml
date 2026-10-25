@@ -17,7 +17,7 @@ jobs:
       - uses: projectdiscovery/actions/setup/go@v1
 
       - name: Test
-        run: go test .
+        run: go test ./...
         working-directory: cmd/simplehttpserver/
 
       - name: Build
