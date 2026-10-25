@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -16,9 +18,8 @@ builds:
         - arm64
   
 archives:
-- format: zip
-  replacements:
-      darwin: macOS
+- formats: [zip]
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ if eq .Os "darwin" }}macOS{{ else }}{{ .Os }}{{ end }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}'
 
 checksum:
   algorithm: sha256

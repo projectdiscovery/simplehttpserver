@@ -1,12 +1,12 @@
 module github.com/projectdiscovery/simplehttpserver
 
-go 1.25.0
+go 1.26.10
 
 require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
-	github.com/projectdiscovery/goflags v0.1.76
-	github.com/projectdiscovery/gologger v1.1.72
+	github.com/projectdiscovery/goflags v0.2.1
+	github.com/projectdiscovery/gologger v1.1.73
 	github.com/projectdiscovery/sslcert v0.0.0-20210416140253-8f56bec1bb5e
 	github.com/projectdiscovery/utils v0.11.1
 	gopkg.in/yaml.v2 v2.4.0
