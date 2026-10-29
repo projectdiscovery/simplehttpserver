@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"bytes"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"time"
@@ -16,17 +17,40 @@ var (
 	EnableLogUA   bool
 )
 
-func (t *HTTPServer) shouldDumpBody(bodysize int64) bool {
-	return t.options.MaxDumpBodySize > 0 && bodysize > t.options.MaxDumpBodySize
+// defaultMaxDumpBodySize bounds the request body kept for logging when
+// -max-dump-body-size is not set.
+const defaultMaxDumpBodySize = 1024 * 1024
+
+func (t *HTTPServer) maxDumpBodySize() int64 {
+	if t.options.MaxDumpBodySize > 0 {
+		return t.options.MaxDumpBodySize
+	}
+	return defaultMaxDumpBodySize
+}
+
+// dumpRequest dumps r with at most maxDumpBodySize bytes of its body. The
+// loglayer runs before authentication, so the size kept must not depend on
+// Content-Length (absent for chunked bodies). The bytes read are put back in
+// front of the body, so the next handlers still read all of it.
+func (t *HTTPServer) dumpRequest(r *http.Request) []byte {
+	dump, _ := httputil.DumpRequest(r, false)
+	if r.Body == nil || r.Body == http.NoBody {
+		return dump
+	}
+	prefix, _ := io.ReadAll(io.LimitReader(r.Body, t.maxDumpBodySize()))
+	r.Body = struct {
+		io.Reader
+		io.Closer
+	}{io.MultiReader(bytes.NewReader(prefix), r.Body), r.Body}
+	return append(dump, prefix...)
 }
 
 func (t *HTTPServer) loglayer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// the body is read only when a log needs it
 		var fullRequest []byte
-		if t.shouldDumpBody(r.ContentLength) {
-			fullRequest, _ = httputil.DumpRequest(r, false)
-		} else {
-			fullRequest, _ = httputil.DumpRequest(r, true)
+		if EnableVerbose || t.jsonLogger != nil {
+			fullRequest = t.dumpRequest(r)
 		}
 		lrw := newLoggingResponseWriter(w, t.options.MaxDumpBodySize)
 		handler.ServeHTTP(lrw, r)
