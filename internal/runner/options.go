@@ -74,7 +74,7 @@ func ParseOptions() *Options {
 		flagSet.BoolVar(&options.Sandbox, "sandbox", false, "Enable sandbox mode"),
 		flagSet.BoolVar(&options.HTTP1Only, "http1", false, "Enable only HTTP1"),
 		flagSet.IntVar(&options.MaxFileSize, "max-file-size", 50, "Max Upload File Size"),
-		flagSet.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size"),
+		flagSet.IntVar(&options.MaxDumpBodySize, "max-dump-body-size", -1, "Max Dump Body Size in MB (request bodies are logged up to 1 MB when not set)"),
 		flagSet.BoolVar(&options.Python, "py", false, "Emulate Python Style"),
 		flagSet.BoolVar(&options.CORS, "cors", false, "Enable Cross-Origin Resource Sharing (CORS)"),
 		flagSet.Var(&options.HTTPHeaders, "header", "Add HTTP Response Header (name: value), can be used multiple times"),
