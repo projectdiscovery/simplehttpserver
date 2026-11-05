@@ -73,6 +73,12 @@ func New(options *Options) (*HTTPServer, error) {
 		dir = SandboxFileSystem{fs: http.Dir(options.Folder), RootFolder: options.Folder}
 	}
 
+	// the python style handler reads the folder directly, without the
+	// sandbox file system
+	if options.Python && options.Sandbox {
+		return nil, errors.New("python style (-py) cannot be used with -sandbox")
+	}
+
 	var httpHandler http.Handler
 	if options.Python {
 		httpHandler = PythonStyle(dir.(http.Dir))

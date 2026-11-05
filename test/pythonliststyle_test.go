@@ -74,3 +74,26 @@ func TestResponseNotFound(t *testing.T) {
 		t.Errorf("want:\n%s\ngot:\n%s", want, got)
 	}
 }
+
+func TestDirectoryListingEscapesPath(t *testing.T) {
+	py := httpserver.PythonStyle("./fixture/pythonliststyle")
+
+	w := httptest.NewRecorder()
+	py.ServeHTTP(w, httptest.NewRequest("GET", "http://example.com/%3Cimg%20src=x%20onerror=alert(document.domain)%3E/..%2F", nil))
+	b, _ := io.ReadAll(w.Result().Body)
+
+	body := string(b)
+	if strings.Contains(body, "<img") {
+		t.Errorf("path written to the listing without escaping:\n%s", body)
+	}
+	if !strings.Contains(body, "&lt;img src=x onerror=alert(document.domain)&gt;") {
+		t.Errorf("escaped path missing from the listing:\n%s", body)
+	}
+}
+
+func TestPythonStyleWithSandboxIsRejected(t *testing.T) {
+	_, err := httpserver.New(&httpserver.Options{Folder: "./fixture/pythonliststyle", Python: true, Sandbox: true})
+	if err == nil {
+		t.Fatal("expected an error for -py with -sandbox")
+	}
+}

@@ -3,6 +3,7 @@ package httpserver
 import (
 	"bytes"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"os"
@@ -82,8 +83,10 @@ func (h *pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http
 		http.ServeFile(writer, request, target)
 		return
 	} else {
-		_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
-		_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
+		// the path comes from the request: escape it before writing HTML
+		escapedPath := html.EscapeString(request.URL.Path)
+		_, _ = fmt.Fprintf(writer, htmlHeader, escapedPath)
+		_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", escapedPath)
 		h.origWriter = writer
 		http.ServeFile(h, request, target)
 		_, _ = fmt.Fprint(writer, htmlFooter)
