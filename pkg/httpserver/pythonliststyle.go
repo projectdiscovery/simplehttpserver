@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 const (
@@ -30,7 +28,7 @@ const (
 
 type pythonStyleHandler struct {
 	origWriter http.ResponseWriter
-	root       http.Dir
+	root       http.FileSystem
 }
 
 func (h *pythonStyleHandler) Header() http.Header {
@@ -75,22 +73,33 @@ func (h *pythonStyleHandler) WriteHeader(statusCode int) {
 }
 
 func (h *pythonStyleHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	target := filepath.Join(string(h.root), filepath.Clean(request.URL.Path))
-	file, err := os.Stat(target)
-
-	if err != nil || !file.IsDir() {
-		http.ServeFile(writer, request, target)
+	// Use the FileSystem's Open to respect sandbox containment checks.
+	// This avoids building raw OS paths and correctly delegates to SandboxFileSystem
+	// or any other http.FileSystem implementation.
+	f, err := h.root.Open(request.URL.Path)
+	if err != nil {
+		http.NotFound(writer, request)
 		return
-	} else {
-		_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
-		_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
-		h.origWriter = writer
-		http.ServeFile(h, request, target)
-		_, _ = fmt.Fprint(writer, htmlFooter)
 	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil || !fi.IsDir() {
+		// Not a directory: serve through the FileSystem handler
+		http.FileServer(h.root).ServeHTTP(writer, request)
+		return
+	}
+	_, _ = fmt.Fprintf(writer, htmlHeader, request.URL.Path)
+	_, _ = fmt.Fprintf(writer, "<h1>Directory listing for %s</h1>\n<hr>\n", request.URL.Path)
+	h.origWriter = writer
+	http.FileServer(h.root).ServeHTTP(h, request)
+	_, _ = fmt.Fprint(writer, htmlFooter)
 }
 
-func PythonStyle(root http.Dir) http.Handler {
+// PythonStyle returns an HTTP handler that renders directory listings in Python's
+// SimpleHTTPServer style.  It accepts any http.FileSystem so that sandbox
+// containment (SandboxFileSystem) is honoured even in this mode.
+func PythonStyle(root http.FileSystem) http.Handler {
 	return &pythonStyleHandler{
 		root: root,
 	}
