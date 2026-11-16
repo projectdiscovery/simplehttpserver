@@ -62,7 +62,10 @@ func New(options *Options) (*HTTPServer, error) {
 
 	var httpHandler http.Handler
 	if options.Python {
-		httpHandler = PythonStyle(dir.(http.Dir))
+		// PythonStyle now accepts http.FileSystem so SandboxFileSystem is
+		// honoured when -sandbox is also set (previously a type assertion to
+		// http.Dir would panic at startup when Sandbox=true).
+		httpHandler = PythonStyle(dir)
 	} else {
 		httpHandler = http.FileServer(dir)
 	}
