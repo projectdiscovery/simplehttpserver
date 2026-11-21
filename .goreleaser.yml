@@ -5,7 +5,10 @@ before:
     - go mod tidy
 
 builds:
-    - binary: simplehttpserver
+    - id: simplehttpserver
+      env:
+        - CGO_ENABLED=0
+      binary: simplehttpserver
       main: cmd/simplehttpserver/simplehttpserver.go
       goos:
         - linux
@@ -16,13 +19,48 @@ builds:
         - 386
         - arm
         - arm64
-  
+
+    # docker-only: the published linux/arm image is arm/v7, but the build above
+    # compiles the default GOARM=6, so the image gets its own armv7 binary,
+    # which no archive ships.
+    - id: simplehttpserver-docker-armv7
+      env:
+        - CGO_ENABLED=0
+      binary: simplehttpserver
+      main: cmd/simplehttpserver/simplehttpserver.go
+      goos:
+        - linux
+      goarch:
+        - arm
+      goarm:
+        - 7
+
 archives:
-- formats: [zip]
+- ids:
+  - simplehttpserver
+  formats: [zip]
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ if eq .Os "darwin" }}macOS{{ else }}{{ .Os }}{{ end }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}'
 
 checksum:
   algorithm: sha256
+
+dockers_v2:
+- ids:
+  - simplehttpserver
+  - simplehttpserver-docker-armv7
+  images:
+    - projectdiscovery/simplehttpserver
+  tags:
+    - latest
+  labels:
+    org.opencontainers.image.created: '{{ .Date }}'
+    org.opencontainers.image.ref.name: '{{ .Tag }}'
+    org.opencontainers.image.revision: '{{ .FullCommit }}'
+    org.opencontainers.image.version: '{{ .Version }}'
+  platforms:
+    - linux/amd64
+    - linux/arm64
+    - linux/arm/v7
 
 announce:
   slack:
